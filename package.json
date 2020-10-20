@@ -13,11 +13,25 @@
     "build": "rollup -c",
     "tsc": "tsc -p . --noEmit",
     "tsc:d": "tsc -p . --outDir lib -d --emitDeclarationOnly",
-    "prepublishOnly": "rimraf lib && npm run build && npm run tsc:d"
+    "prepublishOnly": "rimraf lib && npm run build && npm run tsc:d",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
-  "dependencies": {},
+  "dependencies": {
+    "d3-selection": "^2.0.0",
+    "react": "^16.14.0"
+  },
   "devDependencies": {
+    "@babel/core": "^7.12.3",
     "@rollup/plugin-typescript": "^6.0.0",
+    "@storybook/addon-actions": "^6.0.26",
+    "@storybook/addon-essentials": "^6.0.26",
+    "@storybook/addon-links": "^6.0.26",
+    "@storybook/react": "^6.0.26",
+    "@types/d3-selection": "^2.0.0",
+    "@types/react": "^16.9.53",
+    "babel-loader": "^8.1.0",
+    "react-is": "^16.13.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.32.0",
     "typescript": "^4.0.3"
