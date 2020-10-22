@@ -19,7 +19,10 @@ export const Div = () => {
   return (
     <Viz>
       {datas.map((d) => (
-        <div key={d.name} style={{ width: d.value, background: "steelblue" }}>
+        <div
+          key={d.name}
+          style={{ width: `${d.value}px`, background: "steelblue" }}
+        >
           {d.value}
         </div>
       ))}
