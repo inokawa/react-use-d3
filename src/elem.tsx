@@ -24,7 +24,6 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
     // TODO update
     const update = enter.merge(el);
     Object.entries(props).forEach(([key, val]) => {
-      key = key.toLowerCase();
       if (key === "className") {
       } else if (typeof val === "function") {
         if (key.startsWith("on")) {
