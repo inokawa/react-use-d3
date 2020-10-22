@@ -39,5 +39,19 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
     exit.remove();
   }, [props]);
 
-  return React.createElement(type, { ...props, ref }, children);
+  return React.createElement(type, { ...props, ref }, createElem(children));
 });
+
+export const createElem = (children: React.ReactNode) => {
+  if (!children) {
+    return null;
+  } else if (typeof children === "string" || typeof children === "number") {
+    return children;
+  } else if (React.Children.count(children) > 1) {
+    return children.map((c) => <Elem type={c.type} {...c.props} />);
+  } else if (React.Children.only(children)) {
+    return <Elem type={children.type} {...children.props} />;
+  } else {
+    return null;
+  }
+};
