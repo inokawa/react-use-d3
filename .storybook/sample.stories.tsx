@@ -1,8 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Viz } from "../src";
+import { getRangedData } from "./util";
 
 export default {
   title: "sample",
+};
+
+export const Div = () => {
+  const [datas, setDatas] = useState<{ name: number; value: number }[]>(
+    getRangedData(1000)
+  );
+
+  useEffect(() => {
+    setInterval(() => {
+      setDatas(getRangedData(100));
+    }, 1000);
+  }, []);
+  return (
+    <Viz>
+      {datas.map((d) => (
+        <div key={d.name} style={{ width: d.value, background: "steelblue" }}>
+          {d.value}
+        </div>
+      ))}
+    </Viz>
+  );
+};
+export const Text = () => {
+  return <Viz>aaa</Viz>;
 };
 
 export const One = () => {
