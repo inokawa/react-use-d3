@@ -6,5 +6,5 @@ interface Props {
 }
 
 export const Viz = ({ children }: Props) => {
-  return createElem(children);
+  return createElem(children) as JSX.Element;
 };
