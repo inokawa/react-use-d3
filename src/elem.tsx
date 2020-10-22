@@ -43,15 +43,21 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
 });
 
 export const createElem = (children: React.ReactNode) => {
-  if (!children) {
+  if (!children || typeof children === "boolean") {
     return null;
   } else if (typeof children === "string" || typeof children === "number") {
     return children;
-  } else if (React.Children.count(children) > 1) {
+  } else if (isChildren(children)) {
     return children.map((c) => <Elem type={c.type} {...c.props} />);
-  } else if (React.Children.only(children)) {
+  } else if (isChild(children)) {
     return <Elem type={children.type} {...children.props} />;
   } else {
     return null;
   }
 };
+
+const isChildren = (children: any): children is React.ReactElement[] =>
+  React.Children.count(children) > 1;
+
+const isChild = (children: any): children is React.ReactElement =>
+  React.Children.only(children);
