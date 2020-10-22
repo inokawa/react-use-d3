@@ -47,9 +47,7 @@ export const createElem = (children: React.ReactNode) => {
   } else if (typeof children === "string" || typeof children === "number") {
     return children;
   } else if (isChildren(children)) {
-    return children.map(toElem);
-  } else if (isChild(children)) {
-    return toElem(children);
+    return React.Children.map(children, toElem);
   } else {
     return null;
   }
@@ -58,7 +56,4 @@ export const createElem = (children: React.ReactNode) => {
 const toElem = (c: React.ReactElement) => <Elem type={c.type} {...c.props} />;
 
 const isChildren = (children: any): children is React.ReactElement[] =>
-  React.Children.count(children) > 1;
-
-const isChild = (children: any): children is React.ReactElement =>
-  React.Children.only(children);
+  React.Children.count(children) > 0;
