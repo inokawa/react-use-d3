@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import * as d3 from "d3-selection";
-import * as d3Transition from "d3-transition";
+import * as d3 from "./d3";
 import { kebabCase } from "./utils";
 
 type Props = {
@@ -38,7 +37,7 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
     const enter = el.enter();
 
     // TODO update
-    const t = d3Transition.transition();
+    const t = d3.transition();
     const update = enter.merge(el).transition(t);
     Object.entries(attrs).forEach(([key, val]) => {
       if (key === "style") {

@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect, useRef } from "react";
-import { Elem, createElem } from "./elem";
+import React from "react";
+import { createElem } from "./elem";
 
 interface Props {
   children: React.ReactNode;
