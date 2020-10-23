@@ -14,7 +14,7 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
   const ref = useRef<HTMLElement>(null);
 
   const { className, ...rest } = props;
-  const [attrs, functions] = Object.entries(rest).reduce<
+  const [attrs, eventListeners] = Object.entries(rest).reduce<
     [{ [key: string]: any }, { [key: string]: any }]
   >(
     (acc, [k, v]) => {
@@ -30,7 +30,7 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
 
   useEffect(() => {
     if (!ref.current) return;
-    if (typeof type !== "string") {
+    if (isComponent(type)) {
       return;
     }
     const el = d3.select(ref.current).data([attrs]);
@@ -57,12 +57,12 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
     exit.remove();
   }, [attrs]);
 
-  if (typeof type !== "string") {
+  if (isComponent(type)) {
     return React.createElement(type, props, createElem(children));
   }
   return React.createElement(
     type,
-    { ...functions, className, ref },
+    { ...eventListeners, className, ref },
     createElem(children)
   );
 });
@@ -80,6 +80,10 @@ export const createElem = (children: React.ReactNode) => {
     return null;
   }
 };
+
+const isComponent = (
+  type: Props["type"]
+): type is Exclude<Props["type"], string> => typeof type !== "string";
 
 const isChildren = (children: any): children is React.ReactElement[] =>
   React.Children.count(children) > 0;
