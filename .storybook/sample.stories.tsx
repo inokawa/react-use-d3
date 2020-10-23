@@ -40,8 +40,23 @@ export const Div = () => {
     </Viz>
   );
 };
+
 export const Text = () => {
   return <Viz>aaa</Viz>;
+};
+
+const Comp = (props: any) => {
+  return <span>{props.children}</span>;
+};
+export const Component = () => {
+  return (
+    <Viz>
+      <span>span</span>
+      <Comp>
+        <span>child</span>
+      </Comp>
+    </Viz>
+  );
 };
 
 export const One = () => {
