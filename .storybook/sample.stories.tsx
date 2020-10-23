@@ -22,6 +22,7 @@ export const Div = () => {
         <div
           key={d.name}
           style={{ width: `${d.value}px`, background: "steelblue" }}
+          onClick={() => alert(d.value)}
         >
           {d.value}
         </div>

@@ -11,8 +11,23 @@ type Props = {
 };
 
 export const Elem = React.memo(
-  ({ type, children, className, ...props }: Props) => {
+  ({ type, children, className, ...rest }: Props) => {
     const ref = useRef<HTMLElement>(null);
+
+    const [props, functions] = Object.entries(rest).reduce<
+      [{ [key: string]: any }, { [key: string]: any }]
+    >(
+      (acc, [k, v]) => {
+        if (k.startsWith("on")) {
+          acc[1][k] = v;
+        } else {
+          acc[0][k] = v;
+        }
+
+        return acc;
+      },
+      [{}, {}]
+    );
 
     useEffect(() => {
       if (!ref.current) return;
@@ -46,10 +61,7 @@ export const Elem = React.memo(
 
     return React.createElement(
       type,
-      {
-        className,
-        ref,
-      },
+      { ...functions, className, ref },
       createElem(children)
     );
   }
