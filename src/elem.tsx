@@ -55,40 +55,35 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
       return;
     }
     const el = d3.select(ref.current).data([attrs]);
+    const t = d3.transition();
     const {
       "data-rvz-enter": dataRvzEnter,
+      "data-rvz-update": dataRvzUpdate,
       "data-rvz-exit": dataRvzExit,
-      ...at
+      ...rest
     } = attrs;
     if (dataRvzEnter) {
-      el.style("background", "green");
+      el.transition(t).style("background", "green").style("opacity", "1");
       return;
     }
     if (dataRvzExit) {
-      el.style("background", "red");
+      el.transition(t).style("background", "red").style("opacity", "0");
       return;
     }
-
-    // TODO enter
-    const enter = el.enter();
-    // TODO update
-    // const t = d3.transition();
-    const update = enter.merge(el); //.transition(t);
-    Object.entries(at).forEach(([key, val]) => {
-      if (key === "style") {
-        for (const sKey of Object.keys(val)) {
-          update.style(kebabCase(sKey), val[sKey]);
+    if (dataRvzUpdate) {
+      const update = el.transition(t);
+      Object.entries(rest).forEach(([key, val]) => {
+        if (key === "style") {
+          for (const sKey of Object.keys(val)) {
+            update.style(kebabCase(sKey), val[sKey]);
+          }
+        } else if (typeof val === "function") {
+          // TODO
+        } else {
+          update.attr(key, val);
         }
-      } else if (typeof val === "function") {
-        // TODO
-      } else {
-        update.attr(key, val);
-      }
-    });
-
-    // TODO exit
-    const exit = el.exit();
-    exit.remove();
+      });
+    }
   }, [attrs]);
 
   if (isComponent(type)) {
@@ -116,7 +111,6 @@ export const useElem = (
     const arr = React.Children.toArray(children);
     const sel = ref.current.selectAll("span").data(arr, (c) => c.key);
     const enter = sel.enter();
-    enter.append((d, i) => document.createElement("span"));
     const exit = sel.exit();
 
     const comps = [];
@@ -157,6 +151,7 @@ export const useElem = (
       );
     });
 
+    enter.append((d, i) => document.createElement("span"));
     exit.remove();
     return comps;
   } else {
