@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import * as d3 from "./d3";
 import { kebabCase } from "./utils";
@@ -33,6 +34,7 @@ type Props = {
 
 export const Elem = React.memo(({ type, children, ...props }: Props) => {
   const ref = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(true);
 
   const { key, className, ...rest } = props;
   const [attrs, eventListeners] = Object.entries(rest).reduce<
@@ -51,6 +53,7 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
 
   useEffect(() => {
     if (!ref.current) return;
+    if (!visible) return;
     if (isComponent(type)) {
       return;
     }
@@ -63,11 +66,16 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
       ...rest
     } = attrs;
     if (isEnter) {
-      el.transition(t).style("background", "green").style("opacity", "1");
+      el.transition(t).style("background", "green");
       return;
     }
     if (isExit) {
-      el.transition(t).style("background", "red").style("opacity", "0");
+      el.transition(t)
+        .style("background", "red")
+        .style("opacity", "0")
+        .on("end", () => {
+          setVisible(false);
+        });
       return;
     }
     if (isUpdate) {
@@ -86,6 +94,7 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
     }
   }, [attrs]);
 
+  if (!visible) return null;
   if (isComponent(type)) {
     return React.createElement(type, props, useElem(children, null));
   }
