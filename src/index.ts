@@ -1,1 +1,1 @@
-export { Viz } from "./elem";
+export { Rvz } from "./elem";

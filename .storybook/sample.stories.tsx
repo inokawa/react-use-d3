@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Viz } from "../src";
+import { Rvz } from "../src";
 import { getRangedData } from "./util";
 import * as d3 from "d3";
 
@@ -19,7 +19,7 @@ export const Div = () => {
   const [focused, setFocused] = useState<number | null>(null);
 
   return (
-    <Viz>
+    <Rvz>
       {datas.map((d) => (
         <div
           key={d.name}
@@ -38,12 +38,12 @@ export const Div = () => {
           {d.value}
         </div>
       ))}
-    </Viz>
+    </Rvz>
   );
 };
 
 export const Text = () => {
-  return <Viz>aaa</Viz>;
+  return <Rvz>aaa</Rvz>;
 };
 
 const Comp = (props: any) => {
@@ -51,29 +51,29 @@ const Comp = (props: any) => {
 };
 export const Component = () => {
   return (
-    <Viz>
+    <Rvz>
       <span>span</span>
       <Comp>
         <span>child</span>
       </Comp>
-    </Viz>
+    </Rvz>
   );
 };
 
 export const One = () => {
   return (
-    <Viz>
+    <Rvz>
       <span>aaa</span>
-    </Viz>
+    </Rvz>
   );
 };
 
 export const Two = () => {
   return (
-    <Viz>
+    <Rvz>
       <div style={{ background: "red" }}>aaa</div>
       <div>aaa</div>
-    </Viz>
+    </Rvz>
   );
 };
 
@@ -100,15 +100,15 @@ export const Line = () => {
     .y((d) => yScale(d.value));
 
   return (
-    <Viz>
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      <Rvz>
         <path
           fill="none"
           stroke="steelblue"
           strokeWidth="1.5"
           d={line(datas)}
-        ></path>
-      </svg>
-    </Viz>
+        />
+      </Rvz>
+    </svg>
   );
 };

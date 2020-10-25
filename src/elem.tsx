@@ -9,115 +9,26 @@ import React, {
 import * as d3 from "./d3";
 import { kebabCase } from "./utils";
 
-interface VizProps {
+type Transition = {
+  enter?: (
+    sel: d3.Transition<HTMLElement, any, null, undefined>
+  ) => d3.Transition<HTMLElement, any, null, undefined>;
+  update?: (
+    sel: d3.Transition<HTMLElement, any, null, undefined>
+  ) => d3.Transition<HTMLElement, any, null, undefined>;
+  exit?: (
+    sel: d3.Transition<HTMLElement, any, null, undefined>
+  ) => d3.Transition<HTMLElement, any, null, undefined>;
+};
+
+interface Props {
   children: React.ReactNode;
+  transition?: Transition;
 }
 
-export const Viz = ({ children }: VizProps) => {
+const Root = ({ children, transition }: Props) => {
   const vRef = useRef(d3.select(document.createElement("div")));
 
-  const res = useElem(children, vRef);
-  if (res) {
-    return res;
-  } else {
-    return null;
-  }
-};
-
-type Props = {
-  type: string | React.JSXElementConstructor<any>;
-  key: React.Key | null;
-  children: React.ReactNode;
-  className: string;
-  _dataRvzEnter?: boolean;
-  _dataRvzUpdate?: boolean;
-  _dataRvzExit?: boolean;
-  [key: string]: any;
-};
-
-const Elem = React.memo(
-  ({
-    type,
-    children,
-    _dataRvzEnter: isEnter,
-    _dataRvzUpdate: isUpdate,
-    _dataRvzExit: isExit,
-    ...props
-  }: Props) => {
-    const ref = useRef<HTMLElement>(null);
-    const vRef = useRef(d3.select(document.createElement("div")));
-
-    const [visible, setVisible] = useState(true);
-
-    const { key, className, ...rest } = props;
-    const [attrs, eventListeners] = Object.entries(rest).reduce<
-      [{ [key: string]: any }, { [key: string]: any }]
-    >(
-      (acc, [k, v]) => {
-        if (k.startsWith("on")) {
-          acc[1][k] = v;
-        } else {
-          acc[0][k] = v;
-        }
-        return acc;
-      },
-      [{}, {}]
-    );
-
-    useEffect(() => {
-      if (!ref.current) return;
-      if (!visible) return;
-      if (isComponent(type)) {
-        return;
-      }
-      const el = d3.select(ref.current).data([attrs]);
-      const t = d3.transition();
-      if (isEnter) {
-        el.transition(t).style("background", "green");
-        return;
-      }
-      if (isExit) {
-        el.transition(t)
-          .style("background", "red")
-          .style("opacity", "0")
-          .on("end", () => {
-            setVisible(false);
-          });
-        return;
-      }
-      if (isUpdate) {
-        const update = el.transition(t).style("background", "transparent");
-        Object.entries(attrs).forEach(([key, val]) => {
-          if (key === "style") {
-            for (const sKey of Object.keys(val)) {
-              update.style(kebabCase(sKey), val[sKey]);
-            }
-          } else if (typeof val === "function") {
-            // TODO
-          } else {
-            update.attr(key, val);
-          }
-        });
-      }
-    }, [attrs]);
-
-    if (!visible) return null;
-    return isComponent(type)
-      ? React.createElement(type, props, useElem(children, vRef))
-      : React.createElement(
-          type,
-          { ...eventListeners, className, ref },
-          useElem(children, vRef)
-        );
-  }
-);
-
-const useElem = (
-  children: React.ReactNode,
-  vRef: React.MutableRefObject<
-    d3.Selection<HTMLDivElement, unknown, null, undefined>
-  >
-) => {
   if (!children || typeof children === "boolean") {
     return null;
   } else if (typeof children === "string" || typeof children === "number") {
@@ -131,14 +42,36 @@ const useElem = (
     const comps: JSX.Element[] = [];
     sel.each((c, i) => {
       comps.push(
-        <Elem _dataRvzUpdate key={c.key} type={c.type} {...c.props} />
+        <Elem
+          _d3State="update"
+          transition={transition}
+          key={c.key}
+          type={c.type}
+          {...c.props}
+        />
       );
     });
     exit.each((c, i) => {
-      comps.push(<Elem _dataRvzExit key={c.key} type={c.type} {...c.props} />);
+      comps.push(
+        <Elem
+          _d3State="exit"
+          transition={transition}
+          key={c.key}
+          type={c.type}
+          {...c.props}
+        />
+      );
     });
     enter.each((c, i) => {
-      comps.push(<Elem _dataRvzEnter key={c.key} type={c.type} {...c.props} />);
+      comps.push(
+        <Elem
+          _d3State="enter"
+          transition={transition}
+          key={c.key}
+          type={c.type}
+          {...c.props}
+        />
+      );
     });
 
     enter.append((d, i) => document.createElement("span"));
@@ -149,9 +82,81 @@ const useElem = (
   }
 };
 
+export { Root as Rvz };
+
+type ElemProps = {
+  type: string | React.JSXElementConstructor<any>;
+  children: React.ReactNode;
+  className: string;
+  transition?: Transition;
+  _d3State: "enter" | "update" | "exit";
+  [key: string]: any;
+};
+
+const Elem = React.memo(
+  ({ type, children, transition, _d3State, ...props }: ElemProps) => {
+    const ref = useRef<HTMLElement>(null);
+    const [visible, setVisible] = useState(true);
+
+    const { className, ...rest } = props;
+    const [attrs, functions] = Object.entries(rest).reduce<
+      [{ [key: string]: any }, { [key: string]: any }]
+    >(
+      (acc, [k, v]) => {
+        if (typeof v === "function") {
+          acc[1][k] = v;
+        } else {
+          acc[0][k] = v;
+        }
+        return acc;
+      },
+      [{}, {}]
+    );
+
+    useEffect(() => {
+      if (!ref.current) return;
+      if (!visible) return;
+      if (isComponent(type)) {
+        // TODO change updater
+        return;
+      }
+      const el = d3.select(ref.current).data([attrs]);
+      const t = d3.transition();
+      if (_d3State === "enter") {
+        el.transition(t).style("background", "green");
+        return;
+      } else if (_d3State === "exit") {
+        el.transition(t)
+          .style("background", "red")
+          .style("opacity", "0")
+          .on("end", () => {
+            setVisible(false);
+          });
+        return;
+      } else {
+        const update = el.transition(t).style("background", "transparent");
+        Object.entries(attrs).forEach(([key, val]) => {
+          if (key === "style") {
+            for (const sKey of Object.keys(val)) {
+              update.style(kebabCase(sKey), val[sKey]);
+            }
+          } else {
+            update.attr(kebabCase(key), val);
+          }
+        });
+      }
+    }, [attrs]);
+
+    if (!visible) return null;
+    return isComponent(type)
+      ? React.createElement(type, props, children)
+      : React.createElement(type, { ...functions, className, ref }, children);
+  }
+);
+
 const isComponent = (
-  type: Props["type"]
-): type is Exclude<Props["type"], string> => typeof type !== "string";
+  type: ElemProps["type"]
+): type is Exclude<ElemProps["type"], string> => typeof type !== "string";
 
 const isChildren = (children: any): children is React.ReactElement[] =>
   React.Children.count(children) > 0;
