@@ -1,2 +1,1 @@
-export { Elem } from "./elem";
-export { Viz } from "./viz";
+export { Viz } from "./elem";
