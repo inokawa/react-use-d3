@@ -15,7 +15,7 @@ interface VizProps {
 export const Viz = ({ children }: VizProps) => {
   const rootRef = useRef(d3.select(document.createElement("div")));
 
-  const res = useElem(children, rootRef) as JSX.Element;
+  const res = useElem(children, rootRef);
   if (res) {
     return res;
   } else {
@@ -57,20 +57,20 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
     const el = d3.select(ref.current).data([attrs]);
     const t = d3.transition();
     const {
-      "data-rvz-enter": dataRvzEnter,
-      "data-rvz-update": dataRvzUpdate,
-      "data-rvz-exit": dataRvzExit,
+      "data-rvz-enter": isEnter,
+      "data-rvz-update": isUpdate,
+      "data-rvz-exit": isExit,
       ...rest
     } = attrs;
-    if (dataRvzEnter) {
+    if (isEnter) {
       el.transition(t).style("background", "green").style("opacity", "1");
       return;
     }
-    if (dataRvzExit) {
+    if (isExit) {
       el.transition(t).style("background", "red").style("opacity", "0");
       return;
     }
-    if (dataRvzUpdate) {
+    if (isUpdate) {
       const update = el.transition(t);
       Object.entries(rest).forEach(([key, val]) => {
         if (key === "style") {
@@ -113,19 +113,7 @@ export const useElem = (
     const enter = sel.enter();
     const exit = sel.exit();
 
-    const comps = [];
-    enter.each((c, i) => {
-      comps.push(
-        <Elem
-          data-rvz-enter
-          data-rvz-update={undefined}
-          data-rvz-exit={undefined}
-          key={c.key}
-          type={c.type}
-          {...c.props}
-        />
-      );
-    });
+    const comps: JSX.Element[] = [];
     sel.each((c, i) => {
       comps.push(
         <Elem
@@ -144,6 +132,18 @@ export const useElem = (
           data-rvz-enter={undefined}
           data-rvz-update={undefined}
           data-rvz-exit
+          key={c.key}
+          type={c.type}
+          {...c.props}
+        />
+      );
+    });
+    enter.each((c, i) => {
+      comps.push(
+        <Elem
+          data-rvz-enter
+          data-rvz-update={undefined}
+          data-rvz-exit={undefined}
           key={c.key}
           type={c.type}
           {...c.props}
