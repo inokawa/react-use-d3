@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Viz } from "../src";
 import { getRangedData } from "./util";
+import * as d3 from "d3";
 
 export default {
   title: "sample",
@@ -77,16 +78,37 @@ export const Two = () => {
 };
 
 export const Line = () => {
+  const [datas, setDatas] = useState<{ name: number; value: number }[]>(
+    getRangedData(1000)
+  );
+  useEffect(() => {
+    setInterval(() => {
+      setDatas(getRangedData(100));
+    }, 1000);
+  }, []);
+
+  const width = 400;
+  const height = 300;
+
+  const xScale = d3.scaleLinear().range([0, width]);
+  const yScale = d3.scaleLinear().range([height, 0]);
+  xScale.domain(d3.extent(datas, (d) => d.name));
+  yScale.domain([0, d3.max(datas, (d) => d.value)]);
+  const line = d3
+    .line()
+    .x((d) => xScale(d.name))
+    .y((d) => yScale(d.value));
+
   return (
-    <Viz>
-      <svg width="400" height="300" viewBox="0 0 400 300">
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      <Viz>
         <path
           fill="none"
           stroke="steelblue"
           strokeWidth="1.5"
-          d="M63.229166666666664,195.78947368421055L76.14583333333334,91.89473684210526L114.89583333333334,193.57894736842104L124.58333333333334,167.0526315789474L202.08333333333331,45.473684210526315L221.45833333333334,129.47368421052633L273.125,30L324.79166666666663,213.47368421052633L366.77083333333337,142.73684210526315L370,41.05263157894738"
+          d={line(datas)}
         ></path>
-      </svg>
-    </Viz>
+      </Viz>
+    </svg>
   );
 };
