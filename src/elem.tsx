@@ -14,9 +14,9 @@ interface VizProps {
 }
 
 export const Viz = ({ children }: VizProps) => {
-  const rootRef = useRef(d3.select(document.createElement("div")));
+  const vRef = useRef(d3.select(document.createElement("div")));
 
-  const res = useElem(children, rootRef);
+  const res = useElem(children, vRef);
   if (res) {
     return res;
   } else {
@@ -34,6 +34,8 @@ type Props = {
 
 export const Elem = React.memo(({ type, children, ...props }: Props) => {
   const ref = useRef<HTMLElement>(null);
+  const vRef = useRef(d3.select(document.createElement("div")));
+
   const [visible, setVisible] = useState(true);
 
   const { key, className, ...rest } = props;
@@ -96,29 +98,28 @@ export const Elem = React.memo(({ type, children, ...props }: Props) => {
 
   if (!visible) return null;
   if (isComponent(type)) {
-    return React.createElement(type, props, useElem(children, null));
+    return React.createElement(type, props, useElem(children, vRef));
   }
   return React.createElement(
     type,
     { ...eventListeners, className, ref },
-    useElem(children, null)
+    useElem(children, vRef)
   );
 });
 
 export const useElem = (
   children: React.ReactNode,
-  ref: React.MutableRefObject<
+  vRef: React.MutableRefObject<
     d3.Selection<HTMLDivElement, unknown, null, undefined>
-  > | null
+  >
 ) => {
   if (!children || typeof children === "boolean") {
     return null;
   } else if (typeof children === "string" || typeof children === "number") {
     return children;
   } else if (isChildren(children)) {
-    if (!ref) return null;
     const arr = React.Children.toArray(children);
-    const sel = ref.current.selectAll("span").data(arr, (c) => c.key);
+    const sel = vRef.current.selectAll("span").data(arr, (c, i) => c.key);
     const enter = sel.enter();
     const exit = sel.exit();
 

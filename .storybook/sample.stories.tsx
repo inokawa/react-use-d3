@@ -78,9 +78,9 @@ export const Two = () => {
 };
 
 export const Line = () => {
-  const [datas, setDatas] = useState<{ name: number; value: number }[]>(
-    getRangedData(1000)
-  );
+  type Data = { name: number; value: number };
+
+  const [datas, setDatas] = useState<Data[]>(getRangedData(1000));
   useEffect(() => {
     setInterval(() => {
       setDatas(getRangedData(100));
@@ -95,20 +95,20 @@ export const Line = () => {
   xScale.domain(d3.extent(datas, (d) => d.name));
   yScale.domain([0, d3.max(datas, (d) => d.value)]);
   const line = d3
-    .line()
+    .line<Data>()
     .x((d) => xScale(d.name))
     .y((d) => yScale(d.value));
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      <Viz>
+    <Viz>
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
         <path
           fill="none"
           stroke="steelblue"
           strokeWidth="1.5"
           d={line(datas)}
         ></path>
-      </Viz>
-    </svg>
+      </svg>
+    </Viz>
   );
 };
