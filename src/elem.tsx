@@ -26,7 +26,7 @@ interface Props {
   transition?: Transition;
 }
 
-const Root = ({ children, transition }: Props) => {
+export const Selection = React.memo(({ children, transition }: Props) => {
   const vRef = useRef(d3.select(document.createElement("div")));
 
   if (!children || typeof children === "boolean") {
@@ -80,9 +80,7 @@ const Root = ({ children, transition }: Props) => {
   } else {
     return null;
   }
-};
-
-export { Root as Rvz };
+});
 
 type ElemProps = {
   type: string | React.JSXElementConstructor<any>;

@@ -1,5 +1,5 @@
 {
-  "name": "reactiviz",
+  "name": "d3x",
   "version": "0.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -45,12 +45,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inokawa/reactiviz.git"
+    "url": "git+https://github.com/inokawa/d3x.git"
   },
   "author": "inokawa <stratoooo-taster@yahoo.co.jp> (https://github.com/inokawa/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inokawa/reactiviz/issues"
+    "url": "https://github.com/inokawa/d3x/issues"
   },
-  "homepage": "https://github.com/inokawa/reactiviz#readme"
+  "homepage": "https://github.com/inokawa/d3x#readme"
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Rvz } from "../src";
+import { Selection } from "../src";
 import { getRangedData } from "./util";
 import * as d3 from "d3";
 
@@ -19,7 +19,7 @@ export const Div = () => {
   const [focused, setFocused] = useState<number | null>(null);
 
   return (
-    <Rvz>
+    <Selection>
       {datas.map((d) => (
         <div
           key={d.name}
@@ -38,12 +38,12 @@ export const Div = () => {
           {d.value}
         </div>
       ))}
-    </Rvz>
+    </Selection>
   );
 };
 
 export const Text = () => {
-  return <Rvz>aaa</Rvz>;
+  return <Selection>aaa</Selection>;
 };
 
 const Comp = (props: any) => {
@@ -51,29 +51,29 @@ const Comp = (props: any) => {
 };
 export const Component = () => {
   return (
-    <Rvz>
+    <Selection>
       <span>span</span>
       <Comp>
         <span>child</span>
       </Comp>
-    </Rvz>
+    </Selection>
   );
 };
 
 export const One = () => {
   return (
-    <Rvz>
+    <Selection>
       <span>aaa</span>
-    </Rvz>
+    </Selection>
   );
 };
 
 export const Two = () => {
   return (
-    <Rvz>
+    <Selection>
       <div style={{ background: "red" }}>aaa</div>
       <div>aaa</div>
-    </Rvz>
+    </Selection>
   );
 };
 
@@ -101,14 +101,14 @@ export const Line = () => {
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      <Rvz>
+      <Selection>
         <path
           fill="none"
           stroke="steelblue"
           strokeWidth="1.5"
           d={line(datas)}
         />
-      </Rvz>
+      </Selection>
     </svg>
   );
 };
