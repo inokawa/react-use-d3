@@ -118,30 +118,32 @@ const Elem = React.memo(
         // TODO change updater
         return;
       }
-      const el = d3.select(ref.current).data([attrs]);
+      const el = d3.select(ref.current);
       const t = d3.transition();
+      const trans = (
+        s: d3.Selection<HTMLElement, any, null, undefined>,
+        at: { [key: string]: any }
+      ) => {
+        Object.entries(at).forEach(([key, val]) => {
+          if (key === "style") {
+            for (const sKey of Object.keys(val)) {
+              s.style(kebabCase(sKey), val[sKey]);
+            }
+          } else {
+            s.attr(kebabCase(key), val);
+          }
+        });
+      };
       if (_d3State === "enter") {
-        el.transition(t).style("background", "green");
-        return;
+        el.transition(t).call(trans, { style: { background: "green" } });
       } else if (_d3State === "exit") {
         el.transition(t)
-          .style("background", "red")
-          .style("opacity", "0")
+          .call(trans, { style: { background: "red", opacity: "0" } })
           .on("end", () => {
             setVisible(false);
           });
-        return;
       } else {
-        const update = el.transition(t).style("background", "transparent");
-        Object.entries(attrs).forEach(([key, val]) => {
-          if (key === "style") {
-            for (const sKey of Object.keys(val)) {
-              update.style(kebabCase(sKey), val[sKey]);
-            }
-          } else {
-            update.attr(kebabCase(key), val);
-          }
-        });
+        el.transition(t).call(trans, attrs);
       }
     }, [attrs]);
 
