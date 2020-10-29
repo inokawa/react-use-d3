@@ -1,11 +1,4 @@
-import React, {
-  createRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "./d3";
 import { kebabCase, isChildren, isComponent } from "./utils";
 
@@ -22,62 +15,66 @@ interface Props {
   ) => void;
 }
 
-export const Select = React.memo(({ children, ...props }: Props) => {
-  const vRef = useRef(d3.select(document.createElement("div")));
+export const Select = React.memo(
+  ({ children, ...props }: Props): JSX.Element => {
+    const vRef = useRef(d3.select(document.createElement("div")));
 
-  if (!children || typeof children === "boolean") {
-    return null;
-  } else if (typeof children === "string" || typeof children === "number") {
-    // TODO text interpolation
-    return children;
-  } else if (isChildren(children)) {
-    const arr = React.Children.toArray(children);
-    const sel = vRef.current.selectAll("span").data(arr, (c, i) => c.key);
-    const enter = sel.enter();
-    const exit = sel.exit();
+    if (!children || typeof children === "boolean") {
+      return <>{null}</>;
+    } else if (typeof children === "string" || typeof children === "number") {
+      // TODO text interpolation
+      return <>{children}</>;
+    } else if (isChildren(children)) {
+      const arr = React.Children.toArray(children) as React.ReactElement[];
+      const sel = vRef.current
+        .selectAll("span")
+        .data(arr, (c, i) => (c as any).key);
+      const enter = sel.enter();
+      const exit = sel.exit<React.ReactElement>();
 
-    const comps: JSX.Element[] = [];
-    sel.each((c, i) => {
-      comps.push(
-        <Elem
-          _d3State="update"
-          _transition={props}
-          key={c.key}
-          type={c.type}
-          {...c.props}
-        />
-      );
-    });
-    exit.each((c, i) => {
-      comps.push(
-        <Elem
-          _d3State="exit"
-          _transition={props}
-          key={c.key}
-          type={c.type}
-          {...c.props}
-        />
-      );
-    });
-    enter.each((c, i) => {
-      comps.push(
-        <Elem
-          _d3State="enter"
-          _transition={props}
-          key={c.key}
-          type={c.type}
-          {...c.props}
-        />
-      );
-    });
+      const comps: React.ReactElement[] = [];
+      sel.each((c, i) => {
+        comps.push(
+          <Elem
+            _d3State="update"
+            _transition={props}
+            key={c.key}
+            type={c.type}
+            {...c.props}
+          />
+        );
+      });
+      exit.each((c, i) => {
+        comps.push(
+          <Elem
+            _d3State="exit"
+            _transition={props}
+            key={c.key}
+            type={c.type}
+            {...c.props}
+          />
+        );
+      });
+      enter.each((c, i) => {
+        comps.push(
+          <Elem
+            _d3State="enter"
+            _transition={props}
+            key={c.key}
+            type={c.type}
+            {...c.props}
+          />
+        );
+      });
 
-    enter.append((d, i) => document.createElement("span"));
-    exit.remove();
-    return comps;
-  } else {
-    return null;
+      enter.append((d, i) => document.createElement("span"));
+      exit.remove();
+      return <>{comps}</>;
+    } else {
+      return <>{null}</>;
+    }
   }
-});
+);
 
 type ElemProps = {
   type: string | React.JSXElementConstructor<any>;
@@ -140,7 +137,7 @@ const Elem = React.memo(
           }
         });
       };
-      const tr = sel.transition(d3.transition());
+      const tr = sel.transition(d3.transition() as any);
       if (_d3State === "enter") {
         _transition?.onEnter?.(tr);
         tr.call(setAttr, { style: { background: "green" } });
