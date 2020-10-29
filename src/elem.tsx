@@ -7,31 +7,28 @@ import React, {
   useState,
 } from "react";
 import * as d3 from "./d3";
-import { kebabCase } from "./utils";
-
-type Transition = {
-  enter?: (
-    sel: d3.Transition<HTMLElement, any, null, undefined>
-  ) => d3.Transition<HTMLElement, any, null, undefined>;
-  update?: (
-    sel: d3.Transition<HTMLElement, any, null, undefined>
-  ) => d3.Transition<HTMLElement, any, null, undefined>;
-  exit?: (
-    sel: d3.Transition<HTMLElement, any, null, undefined>
-  ) => d3.Transition<HTMLElement, any, null, undefined>;
-};
+import { kebabCase, isChildren, isComponent } from "./utils";
 
 interface Props {
   children: React.ReactNode;
-  transition?: Transition;
+  onEnter?: (
+    transition: d3.Transition<HTMLElement, unknown, null, undefined>
+  ) => void;
+  onUpdate?: (
+    transition: d3.Transition<HTMLElement, unknown, null, undefined>
+  ) => void;
+  onExit?: (
+    transition: d3.Transition<HTMLElement, unknown, null, undefined>
+  ) => void;
 }
 
-export const Selection = React.memo(({ children, transition }: Props) => {
+export const Select = React.memo(({ children, ...props }: Props) => {
   const vRef = useRef(d3.select(document.createElement("div")));
 
   if (!children || typeof children === "boolean") {
     return null;
   } else if (typeof children === "string" || typeof children === "number") {
+    // TODO text interpolation
     return children;
   } else if (isChildren(children)) {
     const arr = React.Children.toArray(children);
@@ -44,7 +41,7 @@ export const Selection = React.memo(({ children, transition }: Props) => {
       comps.push(
         <Elem
           _d3State="update"
-          transition={transition}
+          _transition={props}
           key={c.key}
           type={c.type}
           {...c.props}
@@ -55,7 +52,7 @@ export const Selection = React.memo(({ children, transition }: Props) => {
       comps.push(
         <Elem
           _d3State="exit"
-          transition={transition}
+          _transition={props}
           key={c.key}
           type={c.type}
           {...c.props}
@@ -66,7 +63,7 @@ export const Selection = React.memo(({ children, transition }: Props) => {
       comps.push(
         <Elem
           _d3State="enter"
-          transition={transition}
+          _transition={props}
           key={c.key}
           type={c.type}
           {...c.props}
@@ -86,13 +83,23 @@ type ElemProps = {
   type: string | React.JSXElementConstructor<any>;
   children: React.ReactNode;
   className: string;
-  transition?: Transition;
   _d3State: "enter" | "update" | "exit";
+  _transition?: {
+    onEnter?: (
+      transition: d3.Transition<HTMLElement, unknown, null, undefined>
+    ) => void;
+    onUpdate?: (
+      transition: d3.Transition<HTMLElement, unknown, null, undefined>
+    ) => void;
+    onExit?: (
+      transition: d3.Transition<HTMLElement, unknown, null, undefined>
+    ) => void;
+  };
   [key: string]: any;
 };
 
 const Elem = React.memo(
-  ({ type, children, transition, _d3State, ...props }: ElemProps) => {
+  ({ type, children, _d3State, _transition, ...props }: ElemProps) => {
     const ref = useRef<HTMLElement>(null);
     const [visible, setVisible] = useState(true);
 
@@ -118,10 +125,9 @@ const Elem = React.memo(
         // TODO change updater
         return;
       }
-      const el = d3.select(ref.current);
-      const t = d3.transition();
-      const trans = (
-        s: d3.Selection<HTMLElement, any, null, undefined>,
+      const sel = d3.select(ref.current);
+      const setAttr = (
+        s: d3.Transition<HTMLElement, unknown, null, undefined>,
         at: { [key: string]: any }
       ) => {
         Object.entries(at).forEach(([key, val]) => {
@@ -134,16 +140,21 @@ const Elem = React.memo(
           }
         });
       };
+      const tr = sel.transition(d3.transition());
       if (_d3State === "enter") {
-        el.transition(t).call(trans, { style: { background: "green" } });
+        _transition?.onEnter?.(tr);
+        tr.call(setAttr, { style: { background: "green" } });
       } else if (_d3State === "exit") {
-        el.transition(t)
-          .call(trans, { style: { background: "red", opacity: "0" } })
-          .on("end", () => {
+        _transition?.onExit?.(tr);
+        tr.call(setAttr, { style: { background: "red", opacity: "0" } }).on(
+          "end",
+          () => {
             setVisible(false);
-          });
+          }
+        );
       } else {
-        el.transition(t).call(trans, attrs);
+        _transition?.onUpdate?.(tr);
+        tr.call(setAttr, attrs);
       }
     }, [attrs]);
 
@@ -153,10 +164,3 @@ const Elem = React.memo(
       : React.createElement(type, { ...functions, className, ref }, children);
   }
 );
-
-const isComponent = (
-  type: ElemProps["type"]
-): type is Exclude<ElemProps["type"], string> => typeof type !== "string";
-
-const isChildren = (children: any): children is React.ReactElement[] =>
-  React.Children.count(children) > 0;

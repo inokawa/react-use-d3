@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Selection } from "../src";
+import { Select } from "../src";
 import { getRangedData } from "./util";
 import * as d3 from "d3";
 
@@ -19,7 +19,7 @@ export const Div = () => {
   const [focused, setFocused] = useState<number | null>(null);
 
   return (
-    <Selection>
+    <Select onEnter={(t) => t}>
       {datas.map((d) => (
         <div
           key={d.name}
@@ -38,12 +38,12 @@ export const Div = () => {
           {d.value}
         </div>
       ))}
-    </Selection>
+    </Select>
   );
 };
 
 export const Text = () => {
-  return <Selection>aaa</Selection>;
+  return <Select>aaa</Select>;
 };
 
 const Comp = (props: any) => {
@@ -51,29 +51,29 @@ const Comp = (props: any) => {
 };
 export const Component = () => {
   return (
-    <Selection>
+    <Select>
       <span>span</span>
       <Comp>
         <span>child</span>
       </Comp>
-    </Selection>
+    </Select>
   );
 };
 
 export const One = () => {
   return (
-    <Selection>
+    <Select>
       <span>aaa</span>
-    </Selection>
+    </Select>
   );
 };
 
 export const Two = () => {
   return (
-    <Selection>
+    <Select>
       <div style={{ background: "red" }}>aaa</div>
       <div>aaa</div>
-    </Selection>
+    </Select>
   );
 };
 
@@ -101,14 +101,14 @@ export const Line = () => {
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      <Selection>
+      <Select>
         <path
           fill="none"
           stroke="steelblue"
           strokeWidth="1.5"
           d={line(datas)}
         />
-      </Selection>
+      </Select>
     </svg>
   );
 };
