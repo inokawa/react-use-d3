@@ -1,10 +1,7 @@
 import React from "react";
 
-const REGEX = /[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g;
-
-export function kebabCase(str: string): string {
-  return str.replace(REGEX, (match) => "-" + match.toLowerCase());
-}
+export const camelToKebab = (str: string): string =>
+  str.replace(/([A-Z])/g, (m) => "-" + m.toLowerCase());
 
 export const isComponent = (
   type: string | React.JSXElementConstructor<any>

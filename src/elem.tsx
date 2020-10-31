@@ -1,19 +1,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "./d3";
-import { kebabCase, isChildren, isComponent } from "./utils";
+import { camelToKebab, isChildren, isComponent } from "./utils";
 
-interface Props {
+type d3Transition = d3.Transition<HTMLElement, unknown, null, undefined>;
+
+type TransitionSetting = {
+  duration?: d3Transition["duration"];
+  ease?: d3Transition["ease"];
+};
+
+type TransitionOption = {
+  style?: { [key in keyof React.CSSProperties]: TransitionSetting };
+  attr?: { [key: string]: TransitionSetting };
+};
+
+type TransitionCallback = (transition: d3Transition) => void;
+
+type Props = {
   children: React.ReactNode;
-  onEnter?: (
-    transition: d3.Transition<HTMLElement, unknown, null, undefined>
-  ) => void;
-  onUpdate?: (
-    transition: d3.Transition<HTMLElement, unknown, null, undefined>
-  ) => void;
-  onExit?: (
-    transition: d3.Transition<HTMLElement, unknown, null, undefined>
-  ) => void;
-}
+} & TransitionProps;
+
+type TransitionProps = {
+  enter?: TransitionOption | TransitionCallback;
+  update?: TransitionOption | TransitionCallback;
+  exit?: TransitionOption | TransitionCallback;
+};
 
 export const Select = React.memo(
   ({ children, ...props }: Props): JSX.Element => {
@@ -82,17 +93,7 @@ type ElemProps = {
   children: React.ReactNode;
   className: string;
   _d3State: "enter" | "update" | "exit";
-  _transition?: {
-    onEnter?: (
-      transition: d3.Transition<HTMLElement, unknown, null, undefined>
-    ) => void;
-    onUpdate?: (
-      transition: d3.Transition<HTMLElement, unknown, null, undefined>
-    ) => void;
-    onExit?: (
-      transition: d3.Transition<HTMLElement, unknown, null, undefined>
-    ) => void;
-  };
+  _transition?: TransitionProps;
   [key: string]: any;
 };
 
@@ -124,35 +125,37 @@ const Elem = React.memo(
         return;
       }
       const sel = d3.select(ref.current);
-      const setAttr = (
-        s: d3.Transition<HTMLElement, unknown, null, undefined>,
-        at: { [key: string]: any }
-      ) => {
-        Object.entries(at).forEach(([key, val]) => {
-          if (key === "style") {
-            for (const sKey of Object.keys(val)) {
-              s.style(kebabCase(sKey), val[sKey]);
-            }
-          } else {
-            s.attr(kebabCase(key), val);
-          }
-        });
-      };
       const tr = sel.transition(d3.transition() as any);
       if (_d3State === "enter") {
-        _transition?.onEnter?.(tr);
-        tr.call(setAttr, { style: { background: "green" } });
-      } else if (_d3State === "exit") {
-        _transition?.onExit?.(tr);
-        tr.call(setAttr, { style: { background: "red", opacity: "0" } }).on(
-          "end",
-          () => {
-            setVisible(false);
+        const enter = _transition?.enter;
+        if (enter) {
+          if (typeof enter === "function") {
+            enter(tr);
+          } else {
+            tr.call(setAttr, attrs);
           }
-        );
+        }
+      } else if (_d3State === "exit") {
+        const exit = _transition?.exit;
+        if (exit) {
+          if (typeof exit === "function") {
+            exit(tr);
+          } else {
+            tr.call(setAttr, attrs);
+          }
+        }
+        tr.on("end", () => {
+          setVisible(false);
+        });
       } else {
-        _transition?.onUpdate?.(tr);
-        tr.call(setAttr, attrs);
+        const update = _transition?.update;
+        if (update) {
+          if (typeof update === "function") {
+            update(tr);
+          } else {
+            tr.call(setAttr, attrs);
+          }
+        }
       }
     }, [attrs]);
 
@@ -162,3 +165,15 @@ const Elem = React.memo(
       : React.createElement(type, { ...functions, className, ref }, children);
   }
 );
+
+const setAttr = (sel: d3Transition, attrs: { [key: string]: any }) => {
+  Object.entries(attrs).forEach(([key, val]) => {
+    if (key === "style") {
+      for (const sKey of Object.keys(val)) {
+        sel.style(camelToKebab(sKey), val[sKey]);
+      }
+    } else {
+      sel.attr(camelToKebab(key), val);
+    }
+  });
+};
