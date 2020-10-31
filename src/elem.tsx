@@ -18,20 +18,20 @@ interface Props {
 export const Select = React.memo(
   ({ children, ...props }: Props): JSX.Element => {
     const vRef = useRef(d3.select(document.createElement("div")));
+    const arr = React.Children.toArray(children) as React.ReactElement[];
+    const sel = vRef.current
+      .selectAll("span")
+      .data(arr, (c, i) => (c as any).key);
+    const enter = sel.enter();
+    const exit = sel.exit<React.ReactElement>();
 
+    let res: JSX.Element;
     if (!children || typeof children === "boolean") {
-      return <>{null}</>;
+      res = <>{null}</>;
     } else if (typeof children === "string" || typeof children === "number") {
       // TODO text interpolation
-      return <>{children}</>;
+      res = <>{children}</>;
     } else if (isChildren(children)) {
-      const arr = React.Children.toArray(children) as React.ReactElement[];
-      const sel = vRef.current
-        .selectAll("span")
-        .data(arr, (c, i) => (c as any).key);
-      const enter = sel.enter();
-      const exit = sel.exit<React.ReactElement>();
-
       const comps: React.ReactElement[] = [];
       sel.each((c, i) => {
         comps.push(
@@ -66,13 +66,14 @@ export const Select = React.memo(
           />
         );
       });
-
-      enter.append((d, i) => document.createElement("span"));
-      exit.remove();
-      return <>{comps}</>;
+      res = <>{comps}</>;
     } else {
-      return <>{null}</>;
+      res = <>{null}</>;
     }
+
+    enter.append((d, i) => document.createElement("span"));
+    exit.remove();
+    return res;
   }
 );
 
