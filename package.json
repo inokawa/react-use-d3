@@ -47,6 +47,16 @@
     "type": "git",
     "url": "git+https://github.com/inokawa/d3x.git"
   },
+  "keywords": [
+    "react",
+    "d3",
+    "visualization",
+    "animation",
+    "svg",
+    "canvas",
+    "css",
+    "transition"
+  ],
   "author": "inokawa <stratoooo-taster@yahoo.co.jp> (https://github.com/inokawa/)",
   "license": "MIT",
   "bugs": {
