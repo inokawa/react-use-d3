@@ -1,1 +1,1 @@
-export { Select } from "./elem";
+export { useD3 } from "./use-d3";
