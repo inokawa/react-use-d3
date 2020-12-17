@@ -1,5 +1,5 @@
 {
-  "name": "d3x",
+  "name": "react-use-d3",
   "version": "0.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -45,7 +45,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inokawa/d3x.git"
+    "url": "git+https://github.com/inokawa/react-use-d3.git"
   },
   "keywords": [
     "react",
@@ -60,7 +60,7 @@
   "author": "inokawa <stratoooo-taster@yahoo.co.jp> (https://github.com/inokawa/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inokawa/d3x/issues"
+    "url": "https://github.com/inokawa/react-use-d3/issues"
   },
-  "homepage": "https://github.com/inokawa/d3x#readme"
+  "homepage": "https://github.com/inokawa/react-use-d3#readme"
 }
