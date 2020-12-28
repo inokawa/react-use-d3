@@ -5,6 +5,8 @@ import React, {
   useState,
   createRef,
   cloneElement,
+  forwardRef,
+  useImperativeHandle,
 } from "react";
 import * as d3 from "d3";
 
@@ -16,7 +18,7 @@ type Option<T> = {
   // applyAttr?:
 };
 
-type RefMap = { [key: string]: React.RefObject<HTMLElement> };
+type RefMap = { [key: string]: React.RefObject<D3NodeHandle> };
 
 export const useD3 = <T extends unknown>(
   data: T[],
@@ -39,8 +41,8 @@ export const useD3 = <T extends unknown>(
   const sel = vRef.current
     .selectAll((d, i) =>
       Object.entries(prevRefMap).reduce<HTMLElement[]>((acc, [k, r]) => {
-        if (r.current) {
-          acc.push(r.current);
+        if (r.current && r.current.node.current) {
+          acc.push(r.current.node.current);
         }
         return acc;
       }, [])
@@ -59,37 +61,44 @@ export const useD3 = <T extends unknown>(
   sel.merge(sel.enter()).each((d, i) => {
     while (exitDatas[0]) {
       if (exitDatas[0] && exitDatas[0].i <= i) {
-        const ex = exitDatas.shift();
+        const ex = exitDatas.shift()!;
         const exitedKey = _key(ex.d, i);
         nodes.push(
-          cloneElement(render(ex.d, i), {
-            key: exitedKey,
-            ref: prevRefMap[exitedKey],
-          })
+          <D3Node
+            key={exitedKey}
+            ref={prevRefMap[exitedKey]}
+            d={ex.d}
+            i={i}
+            render={render}
+          />
         );
       } else {
         break;
       }
     }
     const key = _key(d, i);
-    nodes.push(cloneElement(render(d, i), { key, ref: refMap.current[key] }));
+    nodes.push(
+    );
   });
   exitDatas.forEach((ex) => {
     const exitedKey = _key(ex.d, ex.i);
     nodes.push(
-      cloneElement(render(ex.d, ex.i), {
-        key: exitedKey,
-        ref: prevRefMap[exitedKey],
-      })
+      <D3Node
+        key={exitedKey}
+        ref={prevRefMap[exitedKey]}
+        d={ex.d}
+        i={ex.i}
+        render={render}
+      />
     );
   });
 
   useLayoutEffect(() => {
     const enter = sel.enter().select((d, i) => {
       const ref = refMap.current[_key(d, i)];
-      if (!ref || !ref.current) return undefined;
-      ref.current.__data__ = d;
-      return ref.current;
+      if (!ref || !ref.current || !ref.current.node.current) return undefined;
+      ref.current.node.current.__data__ = d;
+      return ref.current.node.current;
     });
     _enter?.(enter);
 
@@ -109,15 +118,42 @@ export const useD3 = <T extends unknown>(
         fn(
           sel.merge(sel.enter()).select((d, i) => {
             const ref = refMap.current[_key(d, i)];
-            if (!ref || !ref.current) return undefined;
-            return ref.current;
+            if (!ref || !ref.current || !ref.current.node.current)
+              return undefined;
+            return ref.current.node.current;
           })
         );
       });
     },
   ];
 };
+
+type D3NodeProps<T> = {
+  d: T;
+  i: number;
+  render: (d: T, i: number) => React.ReactNode;
 };
+type D3NodeHandle = {
+  node: React.RefObject<HTMLElement>;
+  hide: () => void;
+};
+const D3Node = forwardRef<D3NodeHandle, D3NodeProps<any>>(
+  ({ d, i, render }, ref) => {
+    const [show, setShow] = useState(true);
+    const nodeRef = useRef<HTMLElement>(null);
+    useImperativeHandle(ref, () => ({
+      node: nodeRef,
+      hide: () => {
+        setShow(false);
+      },
+    }));
+    return show
+      ? cloneElement(render(d, i), {
+          ref: nodeRef,
+        })
+      : null;
+  }
+);
 
 const toArray = (data: any): any[] => {
   let arr: any[];
