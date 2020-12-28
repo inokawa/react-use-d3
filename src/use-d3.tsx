@@ -7,6 +7,7 @@ import React, {
   cloneElement,
   forwardRef,
   useImperativeHandle,
+  memo,
 } from "react";
 import * as d3 from "d3";
 
@@ -22,7 +23,7 @@ type RefMap = { [key: string]: React.RefObject<D3NodeHandle> };
 
 export const useD3 = <T extends unknown>(
   data: T[],
-  render: (d: T, i: number) => React.ReactNode,
+  render: (d: T, i: number) => React.ReactElement,
   {
     key: _key = (d, i) => i,
     enter: _enter,
@@ -33,7 +34,9 @@ export const useD3 = <T extends unknown>(
   React.ReactNode,
   (fn: (s: d3.Selection<any, T, any, T>) => void) => void
 ] => {
-  const vRef = useRef(d3.select(document.createElement("custom")));
+  const vRef = useRef(
+    d3.select<HTMLElement, T>(document.createElement("custom"))
+  );
   const refMap = useRef<RefMap>({});
   const prevRefMap = refMap.current;
 
@@ -131,14 +134,14 @@ export const useD3 = <T extends unknown>(
 type D3NodeProps<T> = {
   d: T;
   i: number;
-  render: (d: T, i: number) => React.ReactNode;
+  render: (d: T, i: number) => React.ReactElement;
 };
 type D3NodeHandle = {
   node: React.RefObject<HTMLElement>;
   hide: () => void;
 };
-const D3Node = forwardRef<D3NodeHandle, D3NodeProps<any>>(
-  ({ d, i, render }, ref) => {
+const D3Node = memo(
+  forwardRef<D3NodeHandle, D3NodeProps<any>>(({ d, i, render }, ref) => {
     const [show, setShow] = useState(true);
     const nodeRef = useRef<HTMLElement>(null);
     useImperativeHandle(ref, () => ({
@@ -152,7 +155,7 @@ const D3Node = forwardRef<D3NodeHandle, D3NodeProps<any>>(
           ref: nodeRef,
         })
       : null;
-  }
+  })
 );
 
 const toArray = (data: any): any[] => {
