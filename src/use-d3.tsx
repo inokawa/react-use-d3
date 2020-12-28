@@ -27,23 +27,25 @@ export const useD3 = <T extends unknown>(
     update: _update,
     exit: _exit,
   }: Option<T>
-): React.ReactNode => {
+): [
+  React.ReactNode,
+  (fn: (s: d3.Selection<any, T, any, T>) => void) => void
+] => {
   const vRef = useRef(d3.select(document.createElement("custom")));
   const refMap = useRef<RefMap>({});
+  const prevRefMap = refMap.current;
 
   const arr = useMemo(() => toArray(data), [data]);
-  const prevRefs = refMap.current;
-
-  const prevRefList = Object.entries(prevRefs).reduce<HTMLElement[]>(
-    (acc, [k, r]) => {
-      if (r.current) {
-        acc.push(r.current);
-      }
-      return acc;
-    },
-    []
-  );
-  const sel = vRef.current.selectAll((d, i) => prevRefList).data(arr, _key);
+  const sel = vRef.current
+    .selectAll((d, i) =>
+      Object.entries(prevRefMap).reduce<HTMLElement[]>((acc, [k, r]) => {
+        if (r.current) {
+          acc.push(r.current);
+        }
+        return acc;
+      }, [])
+    )
+    .data(arr, _key);
 
   refMap.current = arr.reduce<RefMap>((acc, d, i) => {
     const key = _key(d, i);
@@ -62,11 +64,12 @@ export const useD3 = <T extends unknown>(
         nodes.push(
           cloneElement(render(ex.d, i), {
             key: exitedKey,
-            ref: prevRefs[exitedKey],
+            ref: prevRefMap[exitedKey],
           })
         );
+      } else {
+        break;
       }
-      break;
     }
     const key = _key(d, i);
     nodes.push(cloneElement(render(d, i), { key, ref: refMap.current[key] }));
@@ -76,7 +79,7 @@ export const useD3 = <T extends unknown>(
     nodes.push(
       cloneElement(render(ex.d, ex.i), {
         key: exitedKey,
-        ref: prevRefs[exitedKey],
+        ref: prevRefMap[exitedKey],
       })
     );
   });
@@ -93,12 +96,27 @@ export const useD3 = <T extends unknown>(
     _update?.(sel);
 
     const exit = sel.exit();
-    _exit?.(exit);
-    exit.on("end", () => {
-    });
+    exit
+      .transition(_exit?.(exit))
+      .on("end", (d, i) => {
+      });
   });
 
-  return <>{nodes}</>;
+  return [
+    <>{nodes}</>,
+    (fn) => {
+      setTimeout(() => {
+        fn(
+          sel.merge(sel.enter()).select((d, i) => {
+            const ref = refMap.current[_key(d, i)];
+            if (!ref || !ref.current) return undefined;
+            return ref.current;
+          })
+        );
+      });
+    },
+  ];
+};
 };
 
 const toArray = (data: any): any[] => {
