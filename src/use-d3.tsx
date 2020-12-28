@@ -65,13 +65,13 @@ export const useD3 = <T extends unknown>(
     while (exitDatas[0]) {
       if (exitDatas[0] && exitDatas[0].i <= i) {
         const ex = exitDatas.shift()!;
-        const exitedKey = _key(ex.d, i);
+        const exitedKey = _key(ex.d, ex.i);
         nodes.push(
           <D3Node
             key={exitedKey}
             ref={prevRefMap[exitedKey]}
             d={ex.d}
-            i={i}
+            i={ex.i}
             render={render}
           />
         );
