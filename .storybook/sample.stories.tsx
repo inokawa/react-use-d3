@@ -16,7 +16,7 @@ export const Div = () => {
     }, 1000);
   }, []);
 
-  const nodes = useD3(datas, (d, i) => <div>{i}</div>, {
+  const [nodes] = useD3(datas, (d, i) => <div>{i}</div>, {
     key: (d) => d.name,
     enter: (s) =>
       s
