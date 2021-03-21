@@ -1,21 +1,23 @@
 import ReactReconciler from "react-reconciler";
+import * as d3 from "d3";
 
-const ATTRS = ["style", "alt", "className", "href", "rel", "src", "target"];
-
-const applyProps = (el, props, k) => {
-  if (k.startsWith("on") && typeof props[k] === "function") {
-    el.addEventListener(k.slice(2).toLowerCase(), props[k]);
-  } else if (ATTRS.includes(k)) {
-    if (k === "className") {
-      el[k] = props[k];
-    } else if (k === "style") {
-      Object.keys(props.style).forEach((k) => {
-        el.style[k] = props.style[k];
-      });
+const applyD3Props = (sel, el, props) => {
+  Object.keys(props).forEach((k) => {
+    if (k === "children") return;
+    if (k.startsWith("on") && typeof props[k] === "function") {
+      sel.on(k.slice(2).toLowerCase(), props[k]);
     } else {
-      el[k] = props[k];
+      if (k === "className") {
+        el[k] = props[k];
+      } else if (k === "style") {
+        Object.keys(props.style).forEach((k) => {
+          sel.style(k, props.style[k]);
+        });
+      } else {
+        sel.attr(k, props[k]);
+      }
     }
-  }
+  });
 };
 
 export const reconciler = ReactReconciler({
@@ -23,37 +25,60 @@ export const reconciler = ReactReconciler({
 
   createInstance(type, props, rootContainer, hostContext, internalHandle) {
     const el = document.createElement(type);
-    Object.keys(props).forEach((k) => {
-      applyProps(el, props, k);
-    });
 
-    return el;
+    return { el, props, children: [] };
   },
   createTextInstance(text, rootContainer, hostContext, internalHandle) {
-    return document.createTextNode(text);
+    return { el: document.createTextNode(text) };
   },
 
   appendChildToContainer(container, child) {
-    container.appendChild(child);
+    const sel = d3.select(container).append(() => child.el);
+    if (child.el.nodeType === 1) {
+      sel.style("opacity", 0).transition().style("opacity", 1);
+      applyD3Props(sel, child.el, child.props);
+    }
   },
   appendChild(parent, child) {
-    parent.appendChild(child);
+    const sel = d3.select(parent.el).append(() => child.el);
+    if (child.el.nodeType === 1) {
+      sel.style("opacity", 0).transition().style("opacity", 1);
+      applyD3Props(sel, child.el, child.props);
+    }
   },
   appendInitialChild(parent, child) {
-    parent.appendChild(child);
+    const sel = d3.select(parent.el).append(() => child.el);
+    if (child.el.nodeType === 1) {
+      sel.style("opacity", 0).transition().style("opacity", 1);
+      applyD3Props(sel, child.el, child.props);
+    }
   },
 
   removeChildFromContainer(container, child) {
-    container.removeChild(child);
+    d3.select(child.el).transition().style("opacity", 0).remove();
   },
   removeChild(parent, child) {
-    parent.removeChild(child);
+    d3.select(child.el).transition().style("opacity", 0).remove();
   },
   insertInContainerBefore(container, child, before) {
-    container.insertBefore(child, before);
+    const sel = d3.select(container).insert(
+      () => child.el,
+      () => before.el
+    );
+    if (child.el.nodeType === 1) {
+      sel.style("opacity", 0).transition().style("opacity", 1);
+      applyD3Props(sel, child.el, child.props);
+    }
   },
   insertBefore(parent, child, before) {
-    parent.insertBefore(child, before);
+    const sel = d3.select(parent.el).insert(
+      () => child.el,
+      () => before.el
+    );
+    if (child.el.nodeType === 1) {
+      sel.style("opacity", 0).transition().style("opacity", 1);
+      applyD3Props(sel, child.el, child.props);
+    }
   },
 
   clearContainer(container) {
@@ -86,12 +111,13 @@ export const reconciler = ReactReconciler({
     newProps,
     finishedWork
   ) {
-    Object.keys(updatePayload).forEach((k) => {
-      applyProps(instance, updatePayload, k);
-    });
+    if (instance.el.nodeType === 1) {
+      const sel = d3.select(instance.el).transition();
+      applyD3Props(sel, instance.el, updatePayload);
+    }
   },
   commitTextUpdate(instance, oldText, newText) {
-    if (oldText !== newText) instance.textContent = newText;
+    if (oldText !== newText) instance.el.textContent = newText;
   },
 
   finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
