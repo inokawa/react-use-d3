@@ -5,7 +5,7 @@ const applyD3Props = (sel, el, props) => {
   Object.keys(props).forEach((k) => {
     if (k === "children") return;
     if (k.startsWith("on") && typeof props[k] === "function") {
-      sel.on(k.slice(2).toLowerCase(), props[k]);
+      d3.select(el).on(k.slice(2).toLowerCase(), props[k]);
     } else {
       if (k === "className") {
         el[k] = props[k];
