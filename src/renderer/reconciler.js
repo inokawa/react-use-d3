@@ -2,8 +2,8 @@ import ReactReconciler from "react-reconciler";
 import * as d3 from "d3";
 
 const applyD3Props = (sel, el, props) => {
-  Object.keys(props).forEach((k) => {
-    if (k === "children") return;
+  for (const k of Object.keys(props)) {
+    if (k === "children") continue;
     if (k.startsWith("on") && typeof props[k] === "function") {
       d3.select(el).on(k.slice(2).toLowerCase(), props[k]);
     } else {
@@ -17,7 +17,7 @@ const applyD3Props = (sel, el, props) => {
         sel.attr(k, props[k]);
       }
     }
-  });
+  }
 };
 
 export const reconciler = ReactReconciler({
@@ -84,9 +84,9 @@ export const reconciler = ReactReconciler({
     hostContext
   ) {
     const payload = {};
-    Object.keys({ ...oldProps, ...newProps }).forEach((k) => {
+    for (const k of Object.keys({ ...oldProps, ...newProps })) {
       if (oldProps[k] !== newProps[k]) payload[k] = newProps[k];
-    });
+    }
     return Object.keys(payload).length === 0 ? null : payload;
   },
   commitUpdate(
@@ -103,7 +103,9 @@ export const reconciler = ReactReconciler({
     }
   },
   commitTextUpdate(instance, oldText, newText) {
-    if (oldText !== newText) instance.el.textContent = newText;
+    if (oldText !== newText) {
+      instance.el.textContent = newText;
+    }
   },
 
   removeChildFromContainer(container, child) {
