@@ -6,13 +6,17 @@ type Container = HTMLElement;
 
 type Type = string; // TODO
 
-type Instance = {
+type ElemInstance = {
+  type: "elem";
   el: HTMLElement;
   props: any;
   children: [];
 };
 
-type TextInstance = { el: Text };
+type TextInstance = {
+  type: "text";
+  el: Text;
+};
 
 type UpdatePayload = {
   [key: string]: any;
@@ -46,10 +50,10 @@ export const reconciler = ReactReconciler({
     rootContainer: Container,
     hostContext: any,
     internalHandle: any
-  ): Instance {
+  ): ElemInstance {
     const el = document.createElement(type);
 
-    return { el, props, children: [] };
+    return { type: "elem", el, props, children: [] };
   },
   createTextInstance(
     text: string,
@@ -57,26 +61,26 @@ export const reconciler = ReactReconciler({
     hostContext: any,
     internalHandle: any
   ): TextInstance {
-    return { el: document.createTextNode(text) };
+    return { type: "text", el: document.createTextNode(text) };
   },
 
-  appendChildToContainer(container: Container, child: Instance) {
+  appendChildToContainer(container: Container, child: ElemInstance) {
     const sel = d3.select(container).append(() => child.el);
-    if (child.el.nodeType === 1) {
+    if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  appendChild(parent: Instance, child: Instance) {
+  appendChild(parent: ElemInstance, child: ElemInstance) {
     const sel = d3.select(parent.el).append(() => child.el);
-    if (child.el.nodeType === 1) {
+    if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  appendInitialChild(parent: Instance, child: Instance) {
+  appendInitialChild(parent: ElemInstance, child: ElemInstance) {
     const sel = d3.select(parent.el).append(() => child.el);
-    if (child.el.nodeType === 1) {
+    if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
@@ -84,31 +88,35 @@ export const reconciler = ReactReconciler({
 
   insertInContainerBefore(
     container: Container,
-    child: Instance,
-    before: Instance
+    child: ElemInstance,
+    before: ElemInstance
   ) {
     const sel = d3.select(container).insert(
       () => child.el,
       () => before.el
     );
-    if (child.el.nodeType === 1) {
+    if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  insertBefore(parent: Instance, child: Instance, before: Instance) {
+  insertBefore(
+    parent: ElemInstance,
+    child: ElemInstance,
+    before: ElemInstance
+  ) {
     const sel = d3.select(parent.el).insert(
       () => child.el,
       () => before.el
     );
-    if (child.el.nodeType === 1) {
+    if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
 
   prepareUpdate(
-    instance: Instance,
+    instance: ElemInstance,
     type: Type,
     oldProps: any,
     newProps: any,
@@ -122,14 +130,14 @@ export const reconciler = ReactReconciler({
     return Object.keys(payload).length === 0 ? null : payload;
   },
   commitUpdate(
-    instance: Instance,
+    instance: ElemInstance,
     updatePayload: UpdatePayload,
     type: Type,
     oldProps: any,
     newProps: any,
     finishedWork: any
   ) {
-    if (instance.el.nodeType === 1) {
+    if (instance.type === "elem") {
       const sel = d3.select(instance.el).transition();
       applyD3Props(sel, instance.el, updatePayload);
     }
@@ -141,10 +149,10 @@ export const reconciler = ReactReconciler({
     }
   },
 
-  removeChildFromContainer(container: Container, child: Instance) {
+  removeChildFromContainer(container: Container, child: ElemInstance) {
     d3.select(child.el).transition().style("opacity", 0).remove();
   },
-  removeChild(parent: Instance, child: Instance) {
+  removeChild(parent: ElemInstance, child: ElemInstance) {
     d3.select(child.el).transition().style("opacity", 0).remove();
   },
 
@@ -157,7 +165,7 @@ export const reconciler = ReactReconciler({
   },
 
   finalizeInitialChildren(
-    instance: Instance,
+    instance: ElemInstance,
     type: Type,
     props: any,
     rootContainer: Container,
@@ -166,7 +174,7 @@ export const reconciler = ReactReconciler({
     return false;
   },
   commitMount(
-    instance: Instance,
+    instance: ElemInstance,
     type: Type,
     props: any,
     internalHandle: any
