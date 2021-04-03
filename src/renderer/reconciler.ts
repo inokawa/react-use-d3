@@ -1,7 +1,24 @@
+// @ts-expect-error
 import ReactReconciler from "react-reconciler";
 import * as d3 from "d3";
 
-const applyD3Props = (sel, el, props) => {
+type Container = HTMLElement;
+
+type Type = string; // TODO
+
+type Instance = {
+  el: HTMLElement;
+  props: any;
+  children: [];
+};
+
+type TextInstance = { el: Text };
+
+type UpdatePayload = {
+  [key: string]: any;
+};
+
+const applyD3Props = (sel: any, el: HTMLElement, props: UpdatePayload) => {
   for (const k of Object.keys(props)) {
     if (k === "children") continue;
     if (k.startsWith("on") && typeof props[k] === "function") {
@@ -23,30 +40,41 @@ const applyD3Props = (sel, el, props) => {
 export const reconciler = ReactReconciler({
   supportsMutation: true,
 
-  createInstance(type, props, rootContainer, hostContext, internalHandle) {
+  createInstance(
+    type: Type,
+    props: any,
+    rootContainer: Container,
+    hostContext: any,
+    internalHandle: any
+  ): Instance {
     const el = document.createElement(type);
 
     return { el, props, children: [] };
   },
-  createTextInstance(text, rootContainer, hostContext, internalHandle) {
+  createTextInstance(
+    text: string,
+    rootContainer: Container,
+    hostContext: any,
+    internalHandle: any
+  ): TextInstance {
     return { el: document.createTextNode(text) };
   },
 
-  appendChildToContainer(container, child) {
+  appendChildToContainer(container: Container, child: Instance) {
     const sel = d3.select(container).append(() => child.el);
     if (child.el.nodeType === 1) {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  appendChild(parent, child) {
+  appendChild(parent: Instance, child: Instance) {
     const sel = d3.select(parent.el).append(() => child.el);
     if (child.el.nodeType === 1) {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  appendInitialChild(parent, child) {
+  appendInitialChild(parent: Instance, child: Instance) {
     const sel = d3.select(parent.el).append(() => child.el);
     if (child.el.nodeType === 1) {
       sel.style("opacity", 0).transition().style("opacity", 1);
@@ -54,7 +82,11 @@ export const reconciler = ReactReconciler({
     }
   },
 
-  insertInContainerBefore(container, child, before) {
+  insertInContainerBefore(
+    container: Container,
+    child: Instance,
+    before: Instance
+  ) {
     const sel = d3.select(container).insert(
       () => child.el,
       () => before.el
@@ -64,7 +96,7 @@ export const reconciler = ReactReconciler({
       applyD3Props(sel, child.el, child.props);
     }
   },
-  insertBefore(parent, child, before) {
+  insertBefore(parent: Instance, child: Instance, before: Instance) {
     const sel = d3.select(parent.el).insert(
       () => child.el,
       () => before.el
@@ -76,46 +108,47 @@ export const reconciler = ReactReconciler({
   },
 
   prepareUpdate(
-    instance,
-    type,
-    oldProps,
-    newProps,
-    rootContainer,
-    hostContext
-  ) {
-    const payload = {};
+    instance: Instance,
+    type: Type,
+    oldProps: any,
+    newProps: any,
+    rootContainer: Container,
+    hostContext: any
+  ): UpdatePayload | null {
+    const payload: UpdatePayload = {};
     for (const k of Object.keys({ ...oldProps, ...newProps })) {
       if (oldProps[k] !== newProps[k]) payload[k] = newProps[k];
     }
     return Object.keys(payload).length === 0 ? null : payload;
   },
   commitUpdate(
-    instance,
-    updatePayload,
-    type,
-    oldProps,
-    newProps,
-    finishedWork
+    instance: Instance,
+    updatePayload: UpdatePayload,
+    type: Type,
+    oldProps: any,
+    newProps: any,
+    finishedWork: any
   ) {
     if (instance.el.nodeType === 1) {
       const sel = d3.select(instance.el).transition();
       applyD3Props(sel, instance.el, updatePayload);
     }
   },
-  commitTextUpdate(instance, oldText, newText) {
+  commitTextUpdate(instance: TextInstance, oldText: string, newText: string) {
     if (oldText !== newText) {
+      // TODO textTween
       instance.el.textContent = newText;
     }
   },
 
-  removeChildFromContainer(container, child) {
+  removeChildFromContainer(container: Container, child: Instance) {
     d3.select(child.el).transition().style("opacity", 0).remove();
   },
-  removeChild(parent, child) {
+  removeChild(parent: Instance, child: Instance) {
     d3.select(child.el).transition().style("opacity", 0).remove();
   },
 
-  clearContainer(container) {
+  clearContainer(container: Container) {
     let c = container.firstChild;
     while (c) {
       container.removeChild(c);
@@ -123,26 +156,41 @@ export const reconciler = ReactReconciler({
     }
   },
 
-  finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
+  finalizeInitialChildren(
+    instance: Instance,
+    type: Type,
+    props: any,
+    rootContainer: Container,
+    hostContext: any
+  ) {
     return false;
   },
-  commitMount(instance, type, props, internalHandle) {},
+  commitMount(
+    instance: Instance,
+    type: Type,
+    props: any,
+    internalHandle: any
+  ) {},
 
-  getRootHostContext(rootContainer) {
+  getRootHostContext(rootContainer: Container) {
     return null;
   },
-  getChildHostContext(parentHostContext, type, rootContainer) {
+  getChildHostContext(
+    parentHostContext: any,
+    type: Type,
+    rootContainer: Container
+  ) {
     return parentHostContext;
   },
-  getPublicInstance(instance) {
+  getPublicInstance(instance: any) {
     return instance;
   },
-  prepareForCommit(containerInfo) {
+  prepareForCommit(containerInfo: any) {
     return null;
   },
-  resetAfterCommit(containerInfo) {},
-  shouldSetTextContent(type, props) {
+  resetAfterCommit(containerInfo: any) {},
+  shouldSetTextContent(type: Type, props: any) {
     return false;
   },
-  resetTextContent(instance) {},
+  resetTextContent(instance: TextInstance) {},
 });
