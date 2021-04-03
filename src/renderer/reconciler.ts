@@ -64,21 +64,24 @@ export const reconciler = ReactReconciler({
     return { type: "text", el: document.createTextNode(text) };
   },
 
-  appendChildToContainer(container: Container, child: ElemInstance) {
+  appendChildToContainer(
+    container: Container,
+    child: ElemInstance | TextInstance
+  ) {
     const sel = d3.select(container).append(() => child.el);
     if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  appendChild(parent: ElemInstance, child: ElemInstance) {
+  appendChild(parent: ElemInstance, child: ElemInstance | TextInstance) {
     const sel = d3.select(parent.el).append(() => child.el);
     if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
       applyD3Props(sel, child.el, child.props);
     }
   },
-  appendInitialChild(parent: ElemInstance, child: ElemInstance) {
+  appendInitialChild(parent: ElemInstance, child: ElemInstance | TextInstance) {
     const sel = d3.select(parent.el).append(() => child.el);
     if (child.type === "elem") {
       sel.style("opacity", 0).transition().style("opacity", 1);
@@ -88,8 +91,8 @@ export const reconciler = ReactReconciler({
 
   insertInContainerBefore(
     container: Container,
-    child: ElemInstance,
-    before: ElemInstance
+    child: ElemInstance | TextInstance,
+    before: ElemInstance | TextInstance
   ) {
     const sel = d3.select(container).insert(
       () => child.el,
@@ -102,8 +105,8 @@ export const reconciler = ReactReconciler({
   },
   insertBefore(
     parent: ElemInstance,
-    child: ElemInstance,
-    before: ElemInstance
+    child: ElemInstance | TextInstance,
+    before: ElemInstance | TextInstance
   ) {
     const sel = d3.select(parent.el).insert(
       () => child.el,
@@ -149,10 +152,13 @@ export const reconciler = ReactReconciler({
     }
   },
 
-  removeChildFromContainer(container: Container, child: ElemInstance) {
+  removeChildFromContainer(
+    container: Container,
+    child: ElemInstance | TextInstance
+  ) {
     d3.select(child.el).transition().style("opacity", 0).remove();
   },
-  removeChild(parent: ElemInstance, child: ElemInstance) {
+  removeChild(parent: ElemInstance, child: ElemInstance | TextInstance) {
     d3.select(child.el).transition().style("opacity", 0).remove();
   },
 
