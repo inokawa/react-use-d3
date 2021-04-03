@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Renderer } from "../src/renderer";
+import { D3Context } from "../src/renderer";
 import { getRangedData } from "./util";
 import * as d3 from "d3";
 
@@ -19,7 +19,7 @@ export const Div = () => {
   const [focused, setFocused] = useState<number | null>(null);
 
   return (
-    <Renderer>
+    <D3Context>
       {datas.map((d) => (
         <div
           key={d.name}
@@ -38,6 +38,6 @@ export const Div = () => {
           {d.value}
         </div>
       ))}
-    </Renderer>
+    </D3Context>
   );
 };
