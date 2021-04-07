@@ -1,5 +1,5 @@
 {
-  "name": "react-d3-fiber",
+  "name": "react-d3-adapter",
   "version": "0.0.0",
   "description": "A tiny React hook to use D3 in declarative way, for data visualization & flexible animation.",
   "main": "lib/index.js",
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inokawa/react-d3-fiber.git"
+    "url": "git+https://github.com/inokawa/react-d3-adapter.git"
   },
   "keywords": [
     "react",
@@ -59,7 +59,7 @@
   "author": "inokawa <stratoooo-taster@yahoo.co.jp> (https://github.com/inokawa/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inokawa/react-d3-fiber/issues"
+    "url": "https://github.com/inokawa/react-d3-adapter/issues"
   },
-  "homepage": "https://github.com/inokawa/react-d3-fiber#readme"
+  "homepage": "https://github.com/inokawa/react-d3-adapter#readme"
 }

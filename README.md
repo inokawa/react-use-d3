@@ -1,6 +1,6 @@
-# react-d3-fiber
+# react-d3-adapter
 
-![check](https://github.com/inokawa/react-d3-fiber/workflows/check/badge.svg)
+![check](https://github.com/inokawa/react-d3-adapter/workflows/check/badge.svg)
 
 A tiny [React](https://github.com/facebook/react) hook to use [D3](https://github.com/d3/d3) in declarative way, for data visualization & flexible animation.
 
