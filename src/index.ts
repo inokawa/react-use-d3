@@ -1,1 +1,1 @@
-export { useD3 } from "./use-d3";
+export { useD3, createElement } from "./use-d3";
