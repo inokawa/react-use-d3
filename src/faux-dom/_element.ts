@@ -376,8 +376,7 @@ export class FauxElement {
     });
   }
 
-  toReact(index: number): React.ReactNode {
-    index = index || 0;
+  toReact(index: number = 0): React.ReactNode {
     const attrs = { ...this.attrs };
     const style = { ...this.style.style };
 
