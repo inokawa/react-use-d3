@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "query-selector": "^2.0.0",
-    "react-reconciler": "^0.26.1",
     "style-attr": "^1.3.0"
   },
   "devDependencies": {
