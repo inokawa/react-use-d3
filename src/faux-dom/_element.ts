@@ -11,14 +11,7 @@ import {
   eventToPropName,
   attrToPropName,
 } from "./utils";
-import {
-  ELEMENT_NODE,
-  DOCUMENT_POSITION_DISCONNECTED,
-  DOCUMENT_POSITION_PRECEDING,
-  DOCUMENT_POSITION_FOLLOWING,
-  DOCUMENT_POSITION_CONTAINS,
-  DOCUMENT_POSITION_CONTAINED_BY,
-} from "./constants";
+import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 
 export class FauxStyle {
   style: { [key: string]: string | null } = {};
@@ -283,9 +276,9 @@ export class FauxElement {
 
   //   function eitherContains(left, right) {
   //     return isAncestor(left, right)
-  //       ? DOCUMENT_POSITION_CONTAINED_BY + DOCUMENT_POSITION_FOLLOWING
+  //       ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
   //       : isAncestor(right, left)
-  //       ? DOCUMENT_POSITION_CONTAINS + DOCUMENT_POSITION_PRECEDING
+  //       ? DOCUMENT_POSITION.CONTAINS + DOCUMENT_POSITION.PRECEDING
   //       : false;
   //   }
 
@@ -304,7 +297,7 @@ export class FauxElement {
   //   const otherRoot = getRootNode(other);
 
   //   if (referenceRoot !== otherRoot) {
-  //     return DOCUMENT_POSITION_DISCONNECTED;
+  //     return DOCUMENT_POSITION.DISCONNECTED;
   //   }
 
   //   const result = eitherContains(this, other);
@@ -314,10 +307,10 @@ export class FauxElement {
 
   //   const first = getFirstNodeByOrder([referenceRoot], this, other);
   //   return first === this
-  //     ? DOCUMENT_POSITION_FOLLOWING
+  //     ? DOCUMENT_POSITION.FOLLOWING
   //     : first === other
-  //     ? DOCUMENT_POSITION_PRECEDING
-  //     : DOCUMENT_POSITION_DISCONNECTED;
+  //     ? DOCUMENT_POSITION.PRECEDING
+  //     : DOCUMENT_POSITION.DISCONNECTED;
   // }
 
   get nextSibling() {

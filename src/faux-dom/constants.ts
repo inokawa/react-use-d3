@@ -1,9 +1,12 @@
 export const ELEMENT_NODE = 1 as const;
-export const DOCUMENT_POSITION_DISCONNECTED = 1 as const;
-export const DOCUMENT_POSITION_PRECEDING = 2 as const;
-export const DOCUMENT_POSITION_FOLLOWING = 4 as const;
-export const DOCUMENT_POSITION_CONTAINS = 8 as const;
-export const DOCUMENT_POSITION_CONTAINED_BY = 16 as const;
+
+export const DOCUMENT_POSITION = {
+  DISCONNECTED: 1,
+  PRECEDING: 2,
+  FOLLOWING: 4,
+  CONTAINS: 8,
+  CONTAINED_BY: 16,
+} as const;
 
 // This was easy to do with Vim.
 // Just saying.
