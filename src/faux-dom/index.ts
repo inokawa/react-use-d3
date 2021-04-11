@@ -12,7 +12,6 @@ import {
   attrToPropName,
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
-import { FauxWindow } from "./_window";
 
 export class FauxStyle {
   style: { [key: string]: string | null } = {};
@@ -403,6 +402,14 @@ export class FauxElement {
     );
   }
 }
+
+const FauxWindow = {
+  getComputedStyle: function (node: FauxElement) {
+    return {
+      getPropertyValue: node.style.getProperty,
+    };
+  },
+};
 
 FauxElement.prototype.ownerDocument = {
   Element: FauxElement,
