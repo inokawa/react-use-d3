@@ -12,6 +12,7 @@ import {
   attrToPropName,
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
+import { FauxWindow } from "./_window";
 
 export class FauxStyle {
   style: { [key: string]: string | null } = {};
@@ -40,6 +41,7 @@ export class FauxElement {
   attrs: { [key: string]: string | null };
   style: FauxStyle;
   eventListeners: { [key: string]: string | number | undefined };
+  transitions: { prop: string; args: any[] }[] = [];
 
   constructor(nodeName: string, parentNode?: FauxElement) {
     this.nodeName = nodeName;
@@ -401,3 +403,20 @@ export class FauxElement {
     );
   }
 }
+
+FauxElement.prototype.ownerDocument = {
+  Element: FauxElement,
+  defaultView: FauxWindow,
+  // withFauxDOM: withFauxDOM(FauxElement),
+  createElement: function (nodeName: string) {
+    return new FauxElement(nodeName);
+  },
+  createElementNS: function (namespace: string, nodeName: string) {
+    return this.createElement(nodeName);
+  },
+  compareDocumentPosition: function () {
+    // The selector engine tries to validate with this, but we don't care.
+    // 8 = DOCUMENT_POSITION_CONTAINS, so we say all nodes are in this document.
+    return DOCUMENT_POSITION.CONTAINS;
+  },
+};

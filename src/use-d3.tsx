@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import { Element as FauxElement } from "./faux-dom/ReactFauxDOM";
-// import * as d3 from "d3";
+import * as d3 from "d3";
+import { FauxElement } from "./faux-dom/_element";
 
 export const createElement = (name: string) => {
   return new FauxElement(name);
