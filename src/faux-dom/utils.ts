@@ -1,4 +1,8 @@
-import { EVENT_NAME_MAPPING } from "./constants";
+import {
+  EVENT_NAME_MAPPING,
+  ATTRIBUTE_NAME_MAPPING,
+  SKIP_NAME_TRANSFORMATION_EXPRESSIONS,
+} from "./constants";
 
 // export function assign(dest: any) {
 //   var args = arguments;
@@ -31,24 +35,6 @@ export function camelCase(str) {
   return camelCased;
 }
 
-export function styleCamelCase(name: string): string {
-  const camel = camelCase(name);
-
-  // Detect if the style property is already camelCased
-  // To not convert Webkit*, Moz* and O* to lowercase
-  if (camel.charAt(0).toUpperCase() === name.charAt(0)) {
-    return name.charAt(0) + camel.slice(1);
-  }
-
-  if (name.charAt(0) === "-") {
-    return camel.indexOf("ms") === 0
-      ? camel
-      : camel.charAt(0).toUpperCase() + camel.slice(1);
-  } else {
-    return camel;
-  }
-}
-
 export function isString(value: any): boolean {
   return typeof value === "string";
 }
@@ -72,3 +58,33 @@ export function mapValues(source, fn) {
 export const eventToPropName = (name: string): string => {
   return EVENT_NAME_MAPPING[name] || name;
 };
+
+export const attrToPropName = (name: string): string => {
+  const skipTransformMatches = SKIP_NAME_TRANSFORMATION_EXPRESSIONS.map(
+    (expr) => expr.test(name)
+  );
+
+  if (skipTransformMatches.some(Boolean)) {
+    return name;
+  } else {
+    return ATTRIBUTE_NAME_MAPPING[name] || camelCase(name);
+  }
+};
+
+export function styleToPropName(name: string): string {
+  const camel = camelCase(name);
+
+  // Detect if the style property is already camelCased
+  // To not convert Webkit*, Moz* and O* to lowercase
+  if (camel.charAt(0).toUpperCase() === name.charAt(0)) {
+    return name.charAt(0) + camel.slice(1);
+  }
+
+  if (name.charAt(0) === "-") {
+    return camel.indexOf("ms") === 0
+      ? camel
+      : camel.charAt(0).toUpperCase() + camel.slice(1);
+  } else {
+    return camel;
+  }
+}

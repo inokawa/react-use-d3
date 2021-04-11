@@ -4,12 +4,12 @@ import styleAttr from "style-attr";
 // @ts-expect-error
 import querySelectorAll from "query-selector";
 import {
-  camelCase,
   isString,
   isUndefined,
   mapValues,
-  styleCamelCase,
+  styleToPropName,
   eventToPropName,
+  attrToPropName,
 } from "./utils";
 import {
   ELEMENT_NODE,
@@ -18,21 +18,19 @@ import {
   DOCUMENT_POSITION_FOLLOWING,
   DOCUMENT_POSITION_CONTAINS,
   DOCUMENT_POSITION_CONTAINED_BY,
-  SKIP_NAME_TRANSFORMATION_EXPRESSIONS,
-  ATTRIBUTE_NAME_MAPPING,
 } from "./constants";
 
 export class FauxStyle {
   style: { [key: string]: string | null } = {};
 
   setProperty: CSSStyleDeclaration["setProperty"] = (name, value) => {
-    this.style[styleCamelCase(name)] = value;
+    this.style[styleToPropName(name)] = value;
   };
   getPropertyValue: CSSStyleDeclaration["getPropertyValue"] = (name) => {
-    return this.style[styleCamelCase(name)] ?? "";
+    return this.style[styleToPropName(name)] ?? "";
   };
   removeProperty: CSSStyleDeclaration["removeProperty"] = (name) => {
-    const key = styleCamelCase(name);
+    const key = styleToPropName(name);
     const old = this.style[key];
     delete this.style[key];
     return old ?? "";
@@ -60,18 +58,6 @@ export class FauxElement {
     this.eventListeners = {};
   }
 
-  attributeToPropName(name: string) {
-    const skipTransformMatches = SKIP_NAME_TRANSFORMATION_EXPRESSIONS.map(
-      (expr) => expr.test(name)
-    );
-
-    if (skipTransformMatches.some(Boolean)) {
-      return name;
-    } else {
-      return ATTRIBUTE_NAME_MAPPING[name] || camelCase(name);
-    }
-  }
-
   setAttribute: Element["setAttribute"] = (name, value) => {
     if (name === "style" && isString(value)) {
       const styles = styleAttr.parse(value);
@@ -80,14 +66,14 @@ export class FauxElement {
         this.style.setProperty(key, styles[key]);
       }
     } else {
-      this.attrs[this.attributeToPropName(name)] = value;
+      this.attrs[attrToPropName(name)] = value;
     }
   };
   setAttributeNS: Element["setAttributeNS"] = (namespace, ...args) =>
     this.setAttribute(...args);
 
   getAttribute: Element["getAttribute"] = (name) => {
-    return this.attrs[this.attributeToPropName(name)];
+    return this.attrs[attrToPropName(name)];
   };
   getAttributeNS: Element["getAttributeNS"] = (namespace, ...args) =>
     this.getAttribute(...args);
@@ -105,7 +91,7 @@ export class FauxElement {
     this.getAttributeNode(...args);
 
   removeAttribute: Element["removeAttribute"] = (name) => {
-    delete this.attrs[this.attributeToPropName(name)];
+    delete this.attrs[attrToPropName(name)];
   };
   removeAttributeNS: Element["removeAttributeNS"] = (namespace, ...args) =>
     this.removeAttribute(...args);
