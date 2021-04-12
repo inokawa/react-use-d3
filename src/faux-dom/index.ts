@@ -377,54 +377,41 @@ export class FauxElement {
       {
         ref: this.ref,
         ...attrs,
-        ...mapValues(this.eventListeners, (listeners) => {
-          return (syntheticEvent) => {
-            let event;
+        ...mapValues(this.eventListeners, (listeners) => (syntheticEvent) => {
+          let event;
 
-            if (syntheticEvent) {
-              event = syntheticEvent.nativeEvent;
-              event.syntheticEvent = syntheticEvent;
-            }
+          if (syntheticEvent) {
+            event = syntheticEvent.nativeEvent;
+            event.syntheticEvent = syntheticEvent;
+          }
 
-            mapValues(listeners, (listener) => {
-              listener.call(self, event);
-            });
-          };
+          mapValues(listeners, (listener) => {
+            listener.call(self, event);
+          });
         }),
         style,
       },
-      this.text ||
-        this.children.map((el, i) => {
-          if (el instanceof FauxElement) {
-            return el.toReact(i);
-          } else {
-            return el;
-          }
-        })
+      this.text || this.children.map((el, i) => el.toReact(i))
     );
   }
 }
 
 const FauxWindow = {
-  getComputedStyle: function (node: FauxElement) {
-    return {
-      getPropertyValue: node.style.getPropertyValue,
-    };
-  },
+  getComputedStyle: (node: FauxElement) => ({
+    getPropertyValue: node.style.getPropertyValue,
+  }),
 };
 
-FauxElement.prototype.ownerDocument = {
+const FauxDocument = {
   Element: FauxElement,
   defaultView: FauxWindow,
-  createElement: function (nodeName: string) {
-    return new FauxElement(nodeName);
-  },
+  createElement: (nodeName: string) => new FauxElement(nodeName),
   createElementNS: function (namespace: string, nodeName: string) {
     return this.createElement(nodeName);
   },
-  compareDocumentPosition: function () {
-    // The selector engine tries to validate with this, but we don't care.
-    // 8 = DOCUMENT_POSITION_CONTAINS, so we say all nodes are in this document.
-    return DOCUMENT_POSITION.CONTAINS;
-  },
+  // The selector engine tries to validate with this, but we don't care.
+  // 8 = DOCUMENT_POSITION_CONTAINS, so we say all nodes are in this document.
+  compareDocumentPosition: () => DOCUMENT_POSITION.CONTAINS,
 };
+
+FauxElement.prototype.ownerDocument = FauxDocument;
