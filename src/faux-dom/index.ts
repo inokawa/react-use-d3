@@ -13,6 +13,10 @@ import {
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 
+function uniqueKey(index: number): string {
+  return "faux-dom-" + index;
+}
+
 export class FauxStyle {
   style: { [key: string]: string | null } = {};
 
@@ -362,12 +366,8 @@ export class FauxElement {
 
     const self = this;
 
-    function uniqueKey() {
-      return "faux-dom-" + index;
-    }
-
     if (isUndefined(attrs.key)) {
-      attrs.key = uniqueKey();
+      attrs.key = uniqueKey(index);
     }
 
     return createElement(
@@ -406,7 +406,7 @@ export class FauxElement {
 const FauxWindow = {
   getComputedStyle: function (node: FauxElement) {
     return {
-      getPropertyValue: node.style.getProperty,
+      getPropertyValue: node.style.getPropertyValue,
     };
   },
 };
@@ -414,7 +414,6 @@ const FauxWindow = {
 FauxElement.prototype.ownerDocument = {
   Element: FauxElement,
   defaultView: FauxWindow,
-  // withFauxDOM: withFauxDOM(FauxElement),
   createElement: function (nodeName: string) {
     return new FauxElement(nodeName);
   },

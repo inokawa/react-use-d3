@@ -11,8 +11,7 @@ export const useD3 = <T, U>(recipe: () => T, deps: U[]): T => {
   const resRef = useRef<T | null>(null);
   const depsRef = useRef<U[]>(deps);
   if (
-    (depsRef.current.length === 0 && depsRef.current.length === deps.length) ||
-    depsRef.current.length !== deps.length ||
+    depsRef.current.length === deps.length &&
     depsRef.current.every((d, i) => d === deps[i])
   ) {
     if (resRef.current === null) {
