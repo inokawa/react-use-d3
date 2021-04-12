@@ -1,37 +1,16 @@
-import {
-  EVENT_NAME_MAPPING,
-  ATTRIBUTE_NAME_MAPPING,
-  SKIP_NAME_TRANSFORMATION_EXPRESSIONS,
-} from "./constants";
+import { EVENT_NAME_MAPPING } from "./constants";
 
-// export function assign(dest: any) {
-//   var args = arguments;
-//   var source;
+const HYPHEN_EXP = /-+([a-z])/gi;
 
-//   for (var i = 1; i < args.length; i++) {
-//     source = args[i];
-
-//     for (var key in source) {
-//       dest[key] = source[key];
-//     }
-//   }
-
-//   return dest;
-// }
-
-const hyphenExpression = /-+([a-z])/gi;
-
-function upperCaseFirstMatch(match, c, offset) {
-  if (offset !== 0) {
-    return c.toUpperCase();
-  } else {
-    return c;
-  }
-}
-
-export function camelCase(str) {
-  const camelCased = str.replace(hyphenExpression, upperCaseFirstMatch);
-  hyphenExpression.lastIndex = 0;
+export function camelCase(str: string): string {
+  const camelCased = str.replace(HYPHEN_EXP, (match, c, offset) => {
+    if (offset !== 0) {
+      return c.toUpperCase();
+    } else {
+      return c;
+    }
+  });
+  HYPHEN_EXP.lastIndex = 0;
   return camelCased;
 }
 
@@ -59,15 +38,15 @@ export const eventToPropName = (name: string): string => {
   return EVENT_NAME_MAPPING[name] || name;
 };
 
-export const attrToPropName = (name: string): string => {
-  const skipTransformMatches = SKIP_NAME_TRANSFORMATION_EXPRESSIONS.map(
-    (expr) => expr.test(name)
-  );
+const SKIP_ATTR_EXP = [/^data-/, /^aria-/] as const;
 
-  if (skipTransformMatches.some(Boolean)) {
+export const attrToPropName = (name: string): string => {
+  if (SKIP_ATTR_EXP.some((expr) => expr.test(name))) {
     return name;
+  } else if (name === "class") {
+    return "className";
   } else {
-    return ATTRIBUTE_NAME_MAPPING[name] || camelCase(name);
+    return camelCase(name);
   }
 };
 
@@ -78,9 +57,7 @@ export function styleToPropName(name: string): string {
   // To not convert Webkit*, Moz* and O* to lowercase
   if (camel.charAt(0).toUpperCase() === name.charAt(0)) {
     return name.charAt(0) + camel.slice(1);
-  }
-
-  if (name.charAt(0) === "-") {
+  } else if (name.charAt(0) === "-") {
     return camel.indexOf("ms") === 0
       ? camel
       : camel.charAt(0).toUpperCase() + camel.slice(1);

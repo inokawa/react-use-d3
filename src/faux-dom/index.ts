@@ -195,25 +195,25 @@ export class FauxElement {
     ...args: any[]
   ) => this.getElementsByTagName(...args);
 
-  // getElementById(id: string): FauxElement | null {
-  //   const children = this.children;
+  getElementById(id: string): FauxElement | null {
+    const children = this.children;
 
-  //   if (children.length === 0) {
-  //     return null;
-  //   } else {
-  //     const match = children.filter((el) => el.getAttribute("id") === id)[0];
+    if (children.length === 0) {
+      return null;
+    } else {
+      const match = children.filter((el) => el.getAttribute("id") === id)[0];
 
-  //     if (match) {
-  //       return match;
-  //     } else {
-  //       const childMatches = children.map((el) => el.getElementById(id));
+      if (match) {
+        return match;
+      } else {
+        const childMatches = children.map((el) => el.getElementById(id));
 
-  //       return childMatches.filter((match) => match !== null)[0] || null;
-  //     }
-  //   }
-  // }
-  // getElementByIdNS: Element["getElementByIdNS"] = (namespace, ...args) =>
-  //   this.getElementById(...args);
+        return childMatches.filter((match) => match !== null)[0] || null;
+      }
+    }
+  }
+  getElementByIdNS: Element["getElementByIdNS"] = (namespace, ...args) =>
+    this.getElementById(...args);
 
   getBoundingClientRect = () => {
     if (!this.ref.current) {

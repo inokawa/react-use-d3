@@ -49,12 +49,3 @@ export const EVENT_NAME_MAPPING = {
   touchstart: "onTouchStart",
   wheel: "onWheel",
 } as const;
-
-export const SKIP_NAME_TRANSFORMATION_EXPRESSIONS = [
-  /^data-/,
-  /^aria-/,
-] as const;
-
-export const ATTRIBUTE_NAME_MAPPING = {
-  class: "className",
-} as const;
