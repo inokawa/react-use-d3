@@ -40,7 +40,7 @@ export class FauxElement {
   nodeName: string;
   text: string;
   parentNode?: FauxElement;
-  childNodes: (FauxElement | HTMLElement)[];
+  childNodes: FauxElement[];
   attrs: { [key: string]: string | null };
   style: FauxStyle;
   eventListeners: { [key: string]: string | number | undefined };
@@ -112,10 +112,10 @@ export class FauxElement {
     }
   }
 
-  appendChild(el: FauxElement | HTMLElement) {
-    if (el instanceof FauxElement) {
-      el.parentNode = this;
-    }
+  appendChild(el: FauxElement) {
+    // if (el instanceof FauxElement) {
+    el.parentNode = this;
+    // }
 
     this.childNodes.push(el);
     return el;
@@ -205,7 +205,7 @@ export class FauxElement {
     return this.ref.current.getBoundingClientRect();
   };
 
-  cloneNode(deep: boolean = true) {
+  cloneNode(deep: boolean = true): FauxElement {
     const el = new FauxElement(this.nodeName, this.parentNode);
     // copy nodeType
     if (this.nodeType) {
@@ -217,18 +217,8 @@ export class FauxElement {
       el.attrs[k] = this.attrs[k];
     }
     // copy the styles
-    for (const k in this.style) {
-      if (
-        this.style.hasOwnProperty(k) &&
-        [
-          "setProperty",
-          "getProperty",
-          "getPropertyValue",
-          "removeProperty",
-        ].indexOf(k) === -1
-      ) {
-        el.style[k] = this.style[k];
-      }
+    for (const k in this.style.style) {
+      el.style.style[k] = this.style.style[k];
     }
     if (deep) {
       el.childNodes = this.childNodes.map((childEl) => {
@@ -239,9 +229,9 @@ export class FauxElement {
         // either FauxElement or true dom element
         childEl = childEl.cloneNode(true);
         // if a faux dom element, modify parentNode
-        if (childEl instanceof FauxElement) {
-          childEl.parentNode = el;
-        }
+        // if (childEl instanceof FauxElement) {
+        childEl.parentNode = el;
+        // }
         return childEl;
       });
     }
