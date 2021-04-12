@@ -18,7 +18,11 @@ function uniqueKey(index: number): string {
 }
 
 export class FauxStyle {
-  style: { [key: string]: string | null } = {};
+  style: { [key: string]: string | null };
+
+  constructor(style: { [key: string]: string | null } = {}) {
+    this.style = style;
+  }
 
   setProperty: CSSStyleDeclaration["setProperty"] = (name, value) => {
     this.style[styleToPropName(name)] = value;
@@ -36,7 +40,7 @@ export class FauxStyle {
 
 export class FauxElement {
   ref = createRef<HTMLElement>();
-  nodeType = ELEMENT_NODE;
+  nodeType: number;
   nodeName: string;
   text: string;
   parentNode?: FauxElement;
@@ -46,14 +50,28 @@ export class FauxElement {
   eventListeners: { [key: string]: string | number | undefined };
   transitions: { prop: string; args: any[] }[] = [];
 
-  constructor(nodeName: string, parentNode?: FauxElement) {
+  constructor(
+    nodeName: string,
+    parentNode?: FauxElement,
+    nodeType: number = ELEMENT_NODE,
+    attrs: { [key: string]: string | null } = {},
+    styles: { [key: string]: string | null } = {}
+  ) {
     this.nodeName = nodeName;
+    this.nodeType = nodeType;
     this.parentNode = parentNode;
     this.childNodes = [];
     this.text = "";
-    this.attrs = {};
-    this.style = new FauxStyle();
+    this.attrs = attrs;
+    this.style = new FauxStyle(styles);
     this.eventListeners = {};
+  }
+
+  getAttr() {
+    return { ...this.attrs };
+  }
+  getStyle() {
+    return { ...this.style.style };
   }
 
   setAttribute: Element["setAttribute"] = (name, value) => {
@@ -206,20 +224,14 @@ export class FauxElement {
   };
 
   cloneNode(deep: boolean = true): FauxElement {
-    const el = new FauxElement(this.nodeName, this.parentNode);
-    // copy nodeType
-    if (this.nodeType) {
-      el.nodeType = this.nodeType;
-    }
+    const el = new FauxElement(
+      this.nodeName,
+      this.parentNode,
+      this.nodeType,
+      this.getAttr(),
+      this.getStyle()
+    );
 
-    // copy the attrs
-    for (const k in this.attrs) {
-      el.attrs[k] = this.attrs[k];
-    }
-    // copy the styles
-    for (const k in this.style.style) {
-      el.style.style[k] = this.style.style[k];
-    }
     if (deep) {
       el.childNodes = this.childNodes.map((childEl) => {
         if (!childEl.nodeType) {
@@ -351,8 +363,8 @@ export class FauxElement {
   }
 
   toReact(index: number = 0): React.ReactNode {
-    const attrs = { ...this.attrs };
-    const style = { ...this.style.style };
+    const attrs = this.getAttr();
+    const style = this.getStyle();
 
     const self = this;
 
