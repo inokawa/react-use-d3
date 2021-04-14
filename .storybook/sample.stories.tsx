@@ -43,8 +43,8 @@ export const Letters = () => {
     const text = graph.selectAll("text").data(datas, (d) => d);
     // update
     text
-      .classed("update", true)
-      //   .transition(t)
+      .attr("class", "update")
+      .transition(t)
       .attr("x", (d, i) => i * 20)
       .attr("y", 0);
     // enter
@@ -52,18 +52,18 @@ export const Letters = () => {
       .enter()
       .append("text")
       .text((d) => d)
-      .classed("enter", true)
+      .attr("class", "enter")
       .attr("x", (d, i) => i * 20)
       .attr("y", -20)
-      //   .attr("fill-opacity", 0)
-      //   .transition(t)
+      .attr("fill-opacity", 0)
+      .transition(t)
       .attr("y", 0)
       .attr("fill-opacity", 1);
     // exit
     text
       .exit()
-      .classed("exit", true)
-      //   .transition(t)
+      .attr("class", "exit")
+      .transition(t)
       .attr("y", 20)
       .attr("fill-opacity", 0)
       .remove();

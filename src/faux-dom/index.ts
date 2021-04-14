@@ -12,6 +12,7 @@ import {
   attrToPropName,
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
+import { FauxNode, FauxNodeHandle } from "./component";
 
 function uniqueKey(index: number): string {
   return "faux-dom-" + index;
@@ -40,6 +41,8 @@ export class FauxStyle {
 
 export class FauxElement {
   ref = createRef<HTMLElement>();
+  mountRef = createRef<FauxNodeHandle>();
+
   nodeType: number;
   nodeName: string;
   text: string;
@@ -48,7 +51,6 @@ export class FauxElement {
   attrs: { [key: string]: string | null };
   style: FauxStyle;
   eventListeners: { [key: string]: string | number | undefined };
-  transitions: { prop: string; args: any[] }[] = [];
 
   constructor(
     nodeName: string,
@@ -73,15 +75,26 @@ export class FauxElement {
   getStyle() {
     return { ...this.style.style };
   }
+  unmount() {
+    this.mountRef.current?.hide();
+  }
 
   setAttribute: Element["setAttribute"] = (name, value) => {
-    if (name === "style" && isString(value)) {
-      const styles = styleAttr.parse(value);
+    if (name === "style") {
+      if (isString(value)) {
+        const styles = styleAttr.parse(value);
 
-      for (const key in styles) {
-        this.style.setProperty(key, styles[key]);
+        for (const key in styles) {
+          if (this.ref.current) {
+            this.ref.current.style.setProperty(key, styles[key]);
+          }
+          this.style.setProperty(key, styles[key]);
+        }
       }
     } else {
+      if (this.ref.current) {
+        this.ref.current.setAttribute(name, value);
+      }
       this.attrs[attrToPropName(name)] = value;
     }
   };
@@ -155,6 +168,7 @@ export class FauxElement {
   removeChild(child: FauxElement) {
     const target = this.childNodes.indexOf(child);
     this.childNodes.splice(target, 1);
+    child.unmount();
   }
 
   querySelector() {
@@ -373,25 +387,37 @@ export class FauxElement {
     }
 
     return createElement(
-      this.nodeName,
+      FauxNode,
       {
-        ref: this.ref,
-        ...attrs,
-        ...mapValues(this.eventListeners, (listeners) => (syntheticEvent) => {
-          let event;
-
-          if (syntheticEvent) {
-            event = syntheticEvent.nativeEvent;
-            event.syntheticEvent = syntheticEvent;
-          }
-
-          mapValues(listeners, (listener) => {
-            listener.call(self, event);
-          });
-        }),
-        style,
+        ref: this.mountRef,
+        key: attrs.key,
       },
-      this.text || this.children.map((el, i) => el.toReact(i))
+      [
+        createElement(
+          this.nodeName,
+          {
+            ref: this.ref,
+            ...attrs,
+            ...mapValues(
+              this.eventListeners,
+              (listeners) => (syntheticEvent) => {
+                let event;
+
+                if (syntheticEvent) {
+                  event = syntheticEvent.nativeEvent;
+                  event.syntheticEvent = syntheticEvent;
+                }
+
+                mapValues(listeners, (listener) => {
+                  listener.call(self, event);
+                });
+              }
+            ),
+            style,
+          },
+          this.text || this.children.map((el, i) => el.toReact(i))
+        ),
+      ]
     );
   }
 }
