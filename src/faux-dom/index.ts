@@ -1,4 +1,4 @@
-import React, { createElement, cloneElement, createRef } from "react";
+import React, { createElement, createRef } from "react";
 // @ts-expect-error
 import styleAttr from "style-attr";
 // @ts-expect-error
@@ -15,10 +15,7 @@ import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 import { FauxNode, FauxNodeHandle } from "./component";
 
 const generateId = (): string => {
-  return (
-    new Date().getTime().toString(16) +
-    Math.floor(1000 * Math.random()).toString(16)
-  );
+  return Math.random().toString(36).substr(2, 9);
 };
 
 export class FauxStyle {
@@ -254,17 +251,9 @@ export class FauxElement {
     );
 
     if (deep) {
-      el.childNodes = this.childNodes.map((childEl) => {
-        if (!childEl.nodeType) {
-          // It's a React element, let React clone it
-          return cloneElement(childEl);
-        }
-        // either FauxElement or true dom element
-        childEl = childEl.cloneNode(true);
-        // if a faux dom element, modify parentNode
-        // if (childEl instanceof FauxElement) {
+      el.childNodes = this.childNodes.map((c) => {
+        const childEl = c.cloneNode(true);
         childEl.parentNode = el;
-        // }
         return childEl;
       });
     }

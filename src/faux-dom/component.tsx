@@ -1,9 +1,4 @@
-import React, {
-  forwardRef,
-  useState,
-  useImperativeHandle,
-  useLayoutEffect,
-} from "react";
+import React, { forwardRef, useState, useImperativeHandle } from "react";
 
 type FauxNodeProps = {
   children: React.ReactElement;
@@ -25,9 +20,6 @@ export const FauxNode = forwardRef<FauxNodeHandle, FauxNodeProps>(
       }),
       [setShow]
     );
-    useLayoutEffect(() => {
-      setShow(true);
-    }, [children]);
     return show ? children : null;
   }
 );
