@@ -14,9 +14,12 @@ import {
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 import { FauxNode, FauxNodeHandle } from "./component";
 
-function uniqueKey(index: number): string {
-  return "faux-dom-" + index;
-}
+const generateId = (): string => {
+  return (
+    new Date().getTime().toString(16) +
+    Math.floor(1000 * Math.random()).toString(16)
+  );
+};
 
 export class FauxStyle {
   style: { [key: string]: string | null };
@@ -40,6 +43,7 @@ export class FauxStyle {
 }
 
 export class FauxElement {
+  id: string;
   ref = createRef<HTMLElement>();
   mountRef = createRef<FauxNodeHandle>();
 
@@ -59,6 +63,7 @@ export class FauxElement {
     attrs: { [key: string]: string | null } = {},
     styles: { [key: string]: string | null } = {}
   ) {
+    this.id = generateId();
     this.nodeName = nodeName;
     this.nodeType = nodeType;
     this.parentNode = parentNode;
@@ -85,17 +90,19 @@ export class FauxElement {
         const styles = styleAttr.parse(value);
 
         for (const key in styles) {
-          if (this.ref.current) {
+          const hasUpdate = this.style.getPropertyValue(key) !== styles[key];
+          this.style.setProperty(key, styles[key]);
+          if (this.ref.current && hasUpdate) {
             this.ref.current.style.setProperty(key, styles[key]);
           }
-          this.style.setProperty(key, styles[key]);
         }
       }
     } else {
-      if (this.ref.current) {
+      const hasUpdate = this.getAttribute(name) !== value;
+      this.attrs[attrToPropName(name)] = value;
+      if (this.ref.current && hasUpdate) {
         this.ref.current.setAttribute(name, value);
       }
-      this.attrs[attrToPropName(name)] = value;
     }
   };
   setAttributeNS: Element["setAttributeNS"] = (namespace, ...args) =>
@@ -376,27 +383,24 @@ export class FauxElement {
     });
   }
 
-  toReact(index: number = 0): React.ReactNode {
+  toReact(): React.ReactNode {
     const attrs = this.getAttr();
     const style = this.getStyle();
 
     const self = this;
 
-    if (isUndefined(attrs.key)) {
-      attrs.key = uniqueKey(index);
-    }
-
     return createElement(
       FauxNode,
       {
         ref: this.mountRef,
-        key: attrs.key,
+        key: this.id,
       },
       [
         createElement(
           this.nodeName,
           {
             ref: this.ref,
+            key: this.id,
             ...attrs,
             ...mapValues(
               this.eventListeners,
@@ -415,7 +419,7 @@ export class FauxElement {
             ),
             style,
           },
-          this.text || this.children.map((el, i) => el.toReact(i))
+          this.text || this.children.map((el) => el.toReact())
         ),
       ]
     );
@@ -440,4 +444,5 @@ const FauxDocument = {
   compareDocumentPosition: () => DOCUMENT_POSITION.CONTAINS,
 };
 
+// @ts-expect-error
 FauxElement.prototype.ownerDocument = FauxDocument;
