@@ -14,11 +14,11 @@ export function camelCase(str: string): string {
   return camelCased;
 }
 
-export function isString(value: any): boolean {
+export function isString(value: any): value is string {
   return typeof value === "string";
 }
 
-export function isUndefined(value: any): boolean {
+export function isUndefined(value: any): value is undefined {
   return typeof value === "undefined";
 }
 

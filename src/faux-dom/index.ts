@@ -102,13 +102,13 @@ export class FauxElement {
       }
     }
   };
-  setAttributeNS: Element["setAttributeNS"] = (namespace, ...args) =>
+  setAttributeNS: Element["setAttributeNS"] = (ns, ...args) =>
     this.setAttribute(...args);
 
   getAttribute: Element["getAttribute"] = (name) => {
     return this.attrs[attrToPropName(name)];
   };
-  getAttributeNS: Element["getAttributeNS"] = (namespace, ...args) =>
+  getAttributeNS: Element["getAttributeNS"] = (ns, ...args) =>
     this.getAttribute(...args);
 
   getAttributeNode: Element["getAttributeNode"] = (name) => {
@@ -117,25 +117,26 @@ export class FauxElement {
       return {
         value: value,
         specified: true,
-      };
+      } as Attr;
     }
+    return null;
   };
-  getAttributeNodeNS: Element["getAttributeNodeNS"] = (namespace, ...args) =>
+  getAttributeNodeNS: Element["getAttributeNodeNS"] = (ns, ...args) =>
     this.getAttributeNode(...args);
 
   removeAttribute: Element["removeAttribute"] = (name) => {
     delete this.attrs[attrToPropName(name)];
   };
-  removeAttributeNS: Element["removeAttributeNS"] = (namespace, ...args) =>
+  removeAttributeNS: Element["removeAttributeNS"] = (ns, ...args) =>
     this.removeAttribute(...args);
 
-  addEventListener(name: string, fn) {
+  addEventListener: Element["addEventListener"] = (name, fn) => {
     const prop = eventToPropName(name);
     this.eventListeners[prop] = this.eventListeners[prop] || [];
     this.eventListeners[prop].push(fn);
-  }
+  };
 
-  removeEventListener(name: string, fn) {
+  removeEventListener: Element["removeEventListener"] = (name, fn) => {
     const listeners = this.eventListeners[eventToPropName(name)];
 
     if (listeners) {
@@ -145,7 +146,7 @@ export class FauxElement {
         listeners.splice(match, 1);
       }
     }
-  }
+  };
 
   appendChild(el: FauxElement) {
     // if (el instanceof FauxElement) {
@@ -175,8 +176,8 @@ export class FauxElement {
     child.unmount();
   }
 
-  querySelector() {
-    return this.querySelectorAll.apply(this, arguments)[0] || null;
+  querySelector(selector: string) {
+    return this.querySelectorAll(selector)[0] || null;
   }
 
   querySelectorAll(selector: string) {
@@ -208,10 +209,8 @@ export class FauxElement {
       return matches.concat.apply(matches, childMatches);
     }
   }
-  getElementsByTagNameNS: Element["getElementsByTagNameNS"] = (
-    namespace: any,
-    ...args: any[]
-  ) => this.getElementsByTagName(...args);
+  getElementsByTagNameNS = (ns: string, nodeName: string) =>
+    this.getElementsByTagName(nodeName);
 
   getElementById(id: string): FauxElement | null {
     const children = this.children;
@@ -230,8 +229,7 @@ export class FauxElement {
       }
     }
   }
-  getElementByIdNS: Element["getElementByIdNS"] = (namespace, ...args) =>
-    this.getElementById(...args);
+  getElementByIdNS = (ns: string, id: string) => this.getElementById(id);
 
   getBoundingClientRect = () => {
     if (!this.ref.current) {
@@ -265,8 +263,8 @@ export class FauxElement {
       nodes: FauxElement[],
       nodeOne: FauxElement,
       nodeTwo: FauxElement
-    ): FauxElement {
-      return nodes.reduce((result, node) => {
+    ): FauxElement | false {
+      return nodes.reduce((result: FauxElement | false, node) => {
         if (result !== false) {
           return result;
         } else if (node === nodeOne) {
@@ -281,7 +279,7 @@ export class FauxElement {
       }, false);
     }
 
-    function isAncestor(source, target) {
+    function isAncestor(source: FauxElement, target: FauxElement): boolean {
       while (target.parentNode) {
         target = target.parentNode;
         if (target === source) {
@@ -291,7 +289,7 @@ export class FauxElement {
       return false;
     }
 
-    function eitherContains(left, right) {
+    function eitherContains(left: FauxElement, right: FauxElement) {
       return isAncestor(left, right)
         ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
         : isAncestor(right, left)
@@ -425,7 +423,7 @@ const FauxDocument = {
   Element: FauxElement,
   defaultView: FauxWindow,
   createElement: (nodeName: string) => new FauxElement(nodeName),
-  createElementNS: function (namespace: string, nodeName: string) {
+  createElementNS: function (ns: string, nodeName: string) {
     return this.createElement(nodeName);
   },
   // The selector engine tries to validate with this, but we don't care.

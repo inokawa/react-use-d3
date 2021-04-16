@@ -14,9 +14,7 @@ export const FauxNode = forwardRef<FauxNodeHandle, FauxNodeProps>(
     useImperativeHandle(
       ref,
       () => ({
-        hide: () => {
-          setShow(false);
-        },
+        hide: () => setShow(false),
       }),
       [setShow]
     );
