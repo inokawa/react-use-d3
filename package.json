@@ -1,7 +1,7 @@
 {
-  "name": "react-d3-adapter",
+  "name": "react-use-d3",
   "version": "0.0.0",
-  "description": "A tiny React hook to use D3 in declarative way, for data visualization & flexible animation.",
+  "description": "A small React hook to use D3 in declarative way, for data visualization & flexible animation.",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "types": "lib/index.d.ts",
@@ -47,7 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inokawa/react-d3-adapter.git"
+    "url": "git+https://github.com/inokawa/react-use-d3.git"
   },
   "keywords": [
     "react",
@@ -62,7 +62,7 @@
   "author": "inokawa <stratoooo-taster@yahoo.co.jp> (https://github.com/inokawa/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inokawa/react-d3-adapter/issues"
+    "url": "https://github.com/inokawa/react-use-d3/issues"
   },
-  "homepage": "https://github.com/inokawa/react-d3-adapter#readme"
+  "homepage": "https://github.com/inokawa/react-use-d3#readme"
 }
