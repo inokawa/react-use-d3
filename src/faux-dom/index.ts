@@ -1,12 +1,11 @@
 import React, { createElement, createRef } from "react";
 // @ts-expect-error
-import styleAttr from "style-attr";
+import * as styleAttr from "style-attr";
 // @ts-expect-error
 import querySelectorAll from "query-selector";
 import {
   isString,
   isUndefined,
-  mapValues,
   styleToPropName,
   eventToPropName,
   attrToPropName,
@@ -18,7 +17,68 @@ const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
 };
 
-export class FauxStyle {
+const mapEventListener = (
+  self: FauxElement,
+  listeners: EventListenerOrEventListenerObject[]
+) => (syntheticEvent: React.SyntheticEvent) => {
+  let event: Event;
+
+  if (syntheticEvent) {
+    event = syntheticEvent.nativeEvent;
+    (event as any).syntheticEvent = syntheticEvent;
+  }
+
+  listeners.forEach((listener) => {
+    (listener as any).call(self, event);
+  });
+};
+
+function isAncestor(source: FauxElement, target: FauxElement): boolean {
+  while (target.parentNode) {
+    target = target.parentNode;
+    if (target === source) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getFirstNodeByOrder(
+  nodes: FauxElement[],
+  nodeOne: FauxElement,
+  nodeTwo: FauxElement
+): FauxElement | false {
+  return nodes.reduce((result: FauxElement | false, node) => {
+    if (result !== false) {
+      return result;
+    } else if (node === nodeOne) {
+      return nodeOne;
+    } else if (node === nodeTwo) {
+      return nodeTwo;
+    } else if (node.childNodes) {
+      return getFirstNodeByOrder(node.childNodes, nodeOne, nodeTwo);
+    } else {
+      return false;
+    }
+  }, false);
+}
+
+function eitherContains(left: FauxElement, right: FauxElement): number | false {
+  return isAncestor(left, right)
+    ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
+    : isAncestor(right, left)
+    ? DOCUMENT_POSITION.CONTAINS + DOCUMENT_POSITION.PRECEDING
+    : false;
+}
+
+function getRootNode(node: FauxElement): FauxElement {
+  while (node.parentNode) {
+    node = node.parentNode;
+  }
+  return node;
+}
+
+class FauxStyle {
   style: { [key: string]: string | null };
 
   constructor(style: { [key: string]: string | null } = {}) {
@@ -51,7 +111,7 @@ export class FauxElement {
   childNodes: FauxElement[];
   attrs: { [key: string]: string | null };
   style: FauxStyle;
-  eventListeners: { [key: string]: string | number | undefined };
+  eventListeners: { [key: string]: EventListenerOrEventListenerObject[] };
 
   constructor(
     nodeName: string,
@@ -130,13 +190,16 @@ export class FauxElement {
   removeAttributeNS: Element["removeAttributeNS"] = (ns, ...args) =>
     this.removeAttribute(...args);
 
-  addEventListener: Element["addEventListener"] = (name, fn) => {
+  addEventListener = (name: string, fn: EventListenerOrEventListenerObject) => {
     const prop = eventToPropName(name);
     this.eventListeners[prop] = this.eventListeners[prop] || [];
     this.eventListeners[prop].push(fn);
   };
 
-  removeEventListener: Element["removeEventListener"] = (name, fn) => {
+  removeEventListener = (
+    name: string,
+    fn: EventListenerOrEventListenerObject
+  ) => {
     const listeners = this.eventListeners[eventToPropName(name)];
 
     if (listeners) {
@@ -258,52 +321,7 @@ export class FauxElement {
     return el;
   }
 
-  compareDocumentPosition(other: FauxElement) {
-    function getFirstNodeByOrder(
-      nodes: FauxElement[],
-      nodeOne: FauxElement,
-      nodeTwo: FauxElement
-    ): FauxElement | false {
-      return nodes.reduce((result: FauxElement | false, node) => {
-        if (result !== false) {
-          return result;
-        } else if (node === nodeOne) {
-          return nodeOne;
-        } else if (node === nodeTwo) {
-          return nodeTwo;
-        } else if (node.childNodes) {
-          return getFirstNodeByOrder(node.childNodes, nodeOne, nodeTwo);
-        } else {
-          return false;
-        }
-      }, false);
-    }
-
-    function isAncestor(source: FauxElement, target: FauxElement): boolean {
-      while (target.parentNode) {
-        target = target.parentNode;
-        if (target === source) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function eitherContains(left: FauxElement, right: FauxElement) {
-      return isAncestor(left, right)
-        ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
-        : isAncestor(right, left)
-        ? DOCUMENT_POSITION.CONTAINS + DOCUMENT_POSITION.PRECEDING
-        : false;
-    }
-
-    function getRootNode(node: FauxElement) {
-      while (node.parentNode) {
-        node = node.parentNode;
-      }
-      return node;
-    }
-
+  compareDocumentPosition(other: FauxElement): number {
     if (this === other) {
       return 0;
     }
@@ -378,6 +396,7 @@ export class FauxElement {
 
     return createElement(
       FauxNode,
+      // @ts-expect-error
       {
         ref: this.mountRef,
         key: this.id,
@@ -389,21 +408,10 @@ export class FauxElement {
             ref: this.ref,
             key: this.id,
             ...attrs,
-            ...mapValues(
-              this.eventListeners,
-              (listeners) => (syntheticEvent) => {
-                let event;
-
-                if (syntheticEvent) {
-                  event = syntheticEvent.nativeEvent;
-                  event.syntheticEvent = syntheticEvent;
-                }
-
-                mapValues(listeners, (listener) => {
-                  listener.call(self, event);
-                });
-              }
-            ),
+            ...Object.keys(this.eventListeners).reduce((acc, k) => {
+              acc[k] = mapEventListener(self, this.eventListeners[k]);
+              return acc;
+            }, {} as { [key: string]: (syntheticEvent: React.SyntheticEvent) => void }),
             style,
           },
           this.text || this.children.map((el) => el.toReact())

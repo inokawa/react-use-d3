@@ -22,20 +22,8 @@ export function isUndefined(value: any): value is undefined {
   return typeof value === "undefined";
 }
 
-export function mapValues(source, fn) {
-  const destination = {};
-
-  for (const key in source) {
-    if (source.hasOwnProperty(key)) {
-      destination[key] = fn(source[key]);
-    }
-  }
-
-  return destination;
-}
-
 export const eventToPropName = (name: string): string => {
-  return EVENT_NAME_MAPPING[name] || name;
+  return (EVENT_NAME_MAPPING as any)[name] || name;
 };
 
 const SKIP_ATTR_EXP = [/^data-/, /^aria-/] as const;
