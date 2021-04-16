@@ -260,75 +260,75 @@ export class FauxElement {
     return el;
   }
 
-  // compareDocumentPosition(other: FauxElement) {
-  //   function getFirstNodeByOrder(
-  //     nodes: FauxElement[],
-  //     nodeOne: FauxElement,
-  //     nodeTwo: FauxElement
-  //   ): FauxElement {
-  //     return nodes.reduce((result, node) => {
-  //       if (result !== false) {
-  //         return result;
-  //       } else if (node === nodeOne) {
-  //         return nodeOne;
-  //       } else if (node === nodeTwo) {
-  //         return nodeTwo;
-  //       } else if (node.childNodes) {
-  //         return getFirstNodeByOrder(node.childNodes, nodeOne, nodeTwo);
-  //       } else {
-  //         return false;
-  //       }
-  //     }, false);
-  //   }
+  compareDocumentPosition(other: FauxElement) {
+    function getFirstNodeByOrder(
+      nodes: FauxElement[],
+      nodeOne: FauxElement,
+      nodeTwo: FauxElement
+    ): FauxElement {
+      return nodes.reduce((result, node) => {
+        if (result !== false) {
+          return result;
+        } else if (node === nodeOne) {
+          return nodeOne;
+        } else if (node === nodeTwo) {
+          return nodeTwo;
+        } else if (node.childNodes) {
+          return getFirstNodeByOrder(node.childNodes, nodeOne, nodeTwo);
+        } else {
+          return false;
+        }
+      }, false);
+    }
 
-  //   function isAncestor(source, target) {
-  //     while (target.parentNode) {
-  //       target = target.parentNode;
-  //       if (target === source) {
-  //         return true;
-  //       }
-  //     }
-  //     return false;
-  //   }
+    function isAncestor(source, target) {
+      while (target.parentNode) {
+        target = target.parentNode;
+        if (target === source) {
+          return true;
+        }
+      }
+      return false;
+    }
 
-  //   function eitherContains(left, right) {
-  //     return isAncestor(left, right)
-  //       ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
-  //       : isAncestor(right, left)
-  //       ? DOCUMENT_POSITION.CONTAINS + DOCUMENT_POSITION.PRECEDING
-  //       : false;
-  //   }
+    function eitherContains(left, right) {
+      return isAncestor(left, right)
+        ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
+        : isAncestor(right, left)
+        ? DOCUMENT_POSITION.CONTAINS + DOCUMENT_POSITION.PRECEDING
+        : false;
+    }
 
-  //   function getRootNode(node: FauxElement) {
-  //     while (node.parentNode) {
-  //       node = node.parentNode;
-  //     }
-  //     return node;
-  //   }
+    function getRootNode(node: FauxElement) {
+      while (node.parentNode) {
+        node = node.parentNode;
+      }
+      return node;
+    }
 
-  //   if (this === other) {
-  //     return 0;
-  //   }
+    if (this === other) {
+      return 0;
+    }
 
-  //   const referenceRoot = getRootNode(this);
-  //   const otherRoot = getRootNode(other);
+    const referenceRoot = getRootNode(this);
+    const otherRoot = getRootNode(other);
 
-  //   if (referenceRoot !== otherRoot) {
-  //     return DOCUMENT_POSITION.DISCONNECTED;
-  //   }
+    if (referenceRoot !== otherRoot) {
+      return DOCUMENT_POSITION.DISCONNECTED;
+    }
 
-  //   const result = eitherContains(this, other);
-  //   if (result) {
-  //     return result;
-  //   }
+    const result = eitherContains(this, other);
+    if (result) {
+      return result;
+    }
 
-  //   const first = getFirstNodeByOrder([referenceRoot], this, other);
-  //   return first === this
-  //     ? DOCUMENT_POSITION.FOLLOWING
-  //     : first === other
-  //     ? DOCUMENT_POSITION.PRECEDING
-  //     : DOCUMENT_POSITION.DISCONNECTED;
-  // }
+    const first = getFirstNodeByOrder([referenceRoot], this, other);
+    return first === this
+      ? DOCUMENT_POSITION.FOLLOWING
+      : first === other
+      ? DOCUMENT_POSITION.PRECEDING
+      : DOCUMENT_POSITION.DISCONNECTED;
+  }
 
   get nextSibling() {
     const siblings = this.parentNode?.children;
