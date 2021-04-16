@@ -2,7 +2,7 @@ import React, { createElement, createRef } from "react";
 // @ts-expect-error
 import * as styleAttr from "style-attr";
 // @ts-expect-error
-import querySelectorAll from "query-selector";
+import querySelectorAll from "query-selector/dist-web";
 import {
   isString,
   isUndefined,
