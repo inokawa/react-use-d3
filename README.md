@@ -1,6 +1,6 @@
 # react-use-d3
 
-![check](https://github.com/inokawa/react-use-d3/workflows/check/badge.svg)
+![check](https://github.com/inokawa/react-use-d3/workflows/check/badge.svg) ![demo](https://github.com/inokawa/react-use-d3/workflows/demo/badge.svg)
 
 A small [React](https://github.com/facebook/react) hook to use [D3](https://github.com/d3/d3) in declarative way, for data visualization & flexible animation.
 
@@ -8,7 +8,7 @@ A small [React](https://github.com/facebook/react) hook to use [D3](https://gith
 
 ## Demo
 
-TODO
+https://inokawa.github.io/react-use-d3/
 
 ## Install
 
