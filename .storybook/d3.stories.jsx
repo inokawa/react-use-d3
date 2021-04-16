@@ -2,6 +2,8 @@ import React from "react";
 import { useD3, createElement } from "../src";
 import * as d3 from "d3";
 
+const url = "https://observablehq.com/@d3/stacked-to-grouped-bars";
+
 export default {
   title: "d3",
 };
@@ -130,7 +132,7 @@ export const StackedToGroupedBars = () => {
 
   return (
     <div>
-      <a>https://observablehq.com/@d3/stacked-to-grouped-bars</a>
+      <a href={url}>{url}</a>
       <button onClick={() => update("stacked")}>stacked</button>
       <button onClick={() => update("grouped")}>grouped</button>
       {e.toReact()}
