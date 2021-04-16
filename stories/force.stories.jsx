@@ -6,7 +6,7 @@ import data from "./miserables.json";
 const url = "https://observablehq.com/@d3/force-directed-graph";
 
 export default {
-  title: "force",
+  title: "example",
 };
 
 const width = 900;

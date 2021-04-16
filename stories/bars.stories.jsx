@@ -5,7 +5,7 @@ import * as d3 from "d3";
 const url = "https://observablehq.com/@d3/stacked-to-grouped-bars";
 
 export default {
-  title: "d3",
+  title: "example",
 };
 
 // Returns an array of m psuedorandom, smoothly-varying non-negative numbers.
