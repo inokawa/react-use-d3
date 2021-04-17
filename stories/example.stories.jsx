@@ -8,6 +8,7 @@ import {
   TweenFormattedNumber,
   TweenTextAppearance,
 } from "./observable/transition-texttween";
+import TransitionChained from "./transition-chained";
 
 export default {
   title: "example",
@@ -68,6 +69,17 @@ export const StreamGraph = () => {
         </select>
       </div>
       <Stream width={900} height={500} mode={mode} />
+    </div>
+  );
+};
+
+export const ChainedTransition = () => {
+  const url = "https://bl.ocks.org/mbostock/70d5541b547cc222aa02";
+
+  return (
+    <div>
+      <a href={url}>{url}</a>
+      <TransitionChained />
     </div>
   );
 };

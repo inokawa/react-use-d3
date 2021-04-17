@@ -79,14 +79,22 @@ function getRootNode(node: D3Element): D3Element {
 }
 
 class FauxStyle {
+  ref = createRef<HTMLElement>();
   style: { [key: string]: string | null };
 
-  constructor(style: { [key: string]: string | null } = {}) {
+  constructor(
+    ref: React.RefObject<HTMLElement>,
+    style: { [key: string]: string | null } = {}
+  ) {
+    this.ref = ref;
     this.style = style;
   }
 
   setProperty: CSSStyleDeclaration["setProperty"] = (name, value) => {
     this.style[styleToPropName(name)] = value;
+    if (this.ref.current) {
+      this.ref.current.style.setProperty(name, value);
+    }
   };
   getPropertyValue: CSSStyleDeclaration["getPropertyValue"] = (name) => {
     return this.style[styleToPropName(name)] ?? "";
@@ -127,7 +135,7 @@ export class D3Element {
     this.childNodes = [];
     this.text = "";
     this.attrs = attrs;
-    this.style = new FauxStyle(styles);
+    this.style = new FauxStyle(this.ref, styles);
     this.eventListeners = {};
   }
 
