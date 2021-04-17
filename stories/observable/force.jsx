@@ -1,16 +1,6 @@
 import React, { useEffect } from "react";
-import { useD3, createElement } from "../src";
+import { useD3, createElement } from "../../src";
 import * as d3 from "d3";
-import data from "./miserables.json";
-
-const url = "https://observablehq.com/@d3/force-directed-graph";
-
-export default {
-  title: "example",
-};
-
-const width = 900;
-const height = 600;
 
 const color = (() => {
   const scale = d3.scaleOrdinal(d3.schemeCategory10);
@@ -42,7 +32,7 @@ const drag = (simulation) => {
     .on("end", dragended);
 };
 
-export const Force = () => {
+export default ({ width, height, data }) => {
   const [e, sim] = useD3(() => {
     const el = createElement("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
@@ -91,15 +81,11 @@ export const Force = () => {
     });
 
     return [svg.node(), sim];
-  }, []);
+  }, [width, height]);
+
   useEffect(() => {
     return () => sim.stop();
   }, []);
 
-  return (
-    <div>
-      <a href={url}>{url}</a>
-      {e.toReact()}
-    </div>
-  );
+  return e.toReact();
 };

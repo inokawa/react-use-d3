@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useD3, createElement } from "../src";
+import React, { useEffect, useCallback, useMemo } from "react";
+import { useD3, createElement } from "../../src";
 import * as d3 from "d3";
-
-const url = "https://observablehq.com/@d3/streamgraph-transitions";
-
-export default {
-  title: "example",
-};
 
 const bumps = (() => {
   // Inspired by Lee Byron’s test data generator.
@@ -27,18 +21,7 @@ const bumps = (() => {
   };
 })();
 
-function randomize() {
-  const layers = stack(
-    d3.transpose(Array.from({ length: n }, () => bumps(m, k)))
-  );
-  y.domain([
-    d3.min(layers, (l) => d3.min(l, (d) => d[0])),
-    d3.max(layers, (l) => d3.max(l, (d) => d[1])),
-  ]);
-  return layers;
-}
-
-const options = [
+export const options = [
   { name: "d3.stackOffsetExpand", value: d3.stackOffsetExpand },
   { name: "d3.stackOffsetNone", value: d3.stackOffsetNone },
   { name: "d3.stackOffsetSilhouette", value: d3.stackOffsetSilhouette },
@@ -48,27 +31,42 @@ const options = [
   },
 ];
 
-const width = 900;
-const height = 500;
 const n = 20; // number of layers
 const m = 200; // number of samples per layer
 const k = 10; // number of bumps per layer
-const x = d3.scaleLinear([0, m - 1], [0, width]);
-const y = d3.scaleLinear([0, 1], [height, 0]);
 const z = d3.interpolateCool;
-const stack = d3
-  .stack()
-  .keys(d3.range(n))
-  .offset(options[3].value)
-  .order(d3.stackOrderNone);
-const area = d3
-  .area()
-  .x((d, i) => x(i))
-  .y0((d) => y(d[0]))
-  .y1((d) => y(d[1]));
 
-export const Streamgraph = () => {
-  // const [option, setOption] = useState("d3.stackOffsetExpand");
+export default ({ width, height, mode }) => {
+  const x = useCallback(d3.scaleLinear([0, m - 1], [0, width]), [width]);
+  const y = useCallback(d3.scaleLinear([0, 1], [height, 0]), [height]);
+  const area = useCallback(
+    d3
+      .area()
+      .x((d, i) => x(i))
+      .y0((d) => y(d[0]))
+      .y1((d) => y(d[1])),
+    [x, y]
+  );
+  const stack = useCallback(
+    d3
+      .stack()
+      .keys(d3.range(n))
+      .offset(options.find((o) => o.name === mode).value)
+      .order(d3.stackOrderNone),
+    [mode]
+  );
+
+  const randomize = useMemo(() => {
+    const layers = stack(
+      d3.transpose(Array.from({ length: n }, () => bumps(m, k)))
+    );
+    y.domain([
+      d3.min(layers, (l) => d3.min(l, (d) => d[0])),
+      d3.max(layers, (l) => d3.max(l, (d) => d[1])),
+    ]);
+    return layers;
+  }, [y, stack]);
+
   const [e, path] = useD3(() => {
     const el = createElement("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
@@ -81,7 +79,7 @@ export const Streamgraph = () => {
       .attr("fill", () => z(Math.random()));
 
     return [svg.node(), path];
-  }, []);
+  }, [width, height, area, randomize]);
 
   useEffect(() => {
     (async () => {
@@ -98,12 +96,7 @@ export const Streamgraph = () => {
     return () => {
       path.selectAll("*").interrupt();
     };
-  }, []);
+  }, [path, randomize]);
 
-  return (
-    <div>
-      <a href={url}>{url}</a>
-      {e.toReact()}
-    </div>
-  );
+  return e.toReact();
 };

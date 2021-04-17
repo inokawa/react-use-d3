@@ -1,18 +1,12 @@
 import React, { useEffect } from "react";
-import { useD3, createElement } from "../src";
+import { useD3, createElement } from "../../src";
 import * as d3 from "d3";
-
-const url = "https://observablehq.com/@d3/transition-end";
-
-export default {
-  title: "example",
-};
 
 const w = 640;
 const r = 32;
 const h = r * 3;
 
-export const TransitionEnd = () => {
+export default () => {
   const [e, circle] = useD3(() => {
     const el = createElement("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, w, h]);
@@ -48,12 +42,10 @@ export const TransitionEnd = () => {
           .end();
       }
     })();
+    return () => {
+      circle.selectAll("*").interrupt();
+    };
   }, []);
 
-  return (
-    <div>
-      <a href={url}>{url}</a>
-      {e.toReact()}
-    </div>
-  );
+  return e.toReact();
 };
