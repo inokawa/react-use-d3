@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useD3, createElement } from "../../src";
 import * as d3 from "d3";
 

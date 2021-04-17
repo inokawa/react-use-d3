@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useD3, createElement } from "../../src";
 import * as d3 from "d3";
 
@@ -56,7 +56,7 @@ export default ({ width, height, mode }) => {
     [mode]
   );
 
-  const randomize = useMemo(() => {
+  const randomize = useCallback(() => {
     const layers = stack(
       d3.transpose(Array.from({ length: n }, () => bumps(m, k)))
     );
