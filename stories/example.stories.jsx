@@ -2,7 +2,12 @@ import React, { Fragment, useState } from "react";
 import Bars from "./observable/bars";
 import Force from "./observable/force";
 import Stream, { options as streamOptions } from "./observable/stream";
-import Transition from "./observable/transition";
+import TransitionCircle from "./observable/transition-end";
+import {
+  TweenNumber,
+  TweenFormattedNumber,
+  TweenTextAppearance,
+} from "./observable/transition-texttween";
 
 export default {
   title: "example",
@@ -73,7 +78,20 @@ export const TransitionEnd = () => {
   return (
     <div>
       <a href={url}>{url}</a>
-      <Transition />
+      <TransitionCircle />
+    </div>
+  );
+};
+
+export const TransitionTexttween = () => {
+  const url = "https://observablehq.com/@d3/transition-texttween";
+
+  return (
+    <div>
+      <a href={url}>{url}</a>
+      <TweenNumber />
+      <TweenFormattedNumber />
+      <TweenTextAppearance />
     </div>
   );
 };
