@@ -1,8 +1,10 @@
 import { useRef } from "react";
 import { D3Element } from "./dom";
 
-export const d3Element = (name: string) => {
-  return new D3Element(name);
+export const d3Element = (
+  name: string
+): HTMLElement & Pick<D3Element, "toReact"> => {
+  return new D3Element(name) as any;
 };
 
 export const useD3 = <T, U>(recipe: () => T, deps: U[]): T => {

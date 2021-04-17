@@ -30,10 +30,7 @@ export const Letters = () => {
 
   const [e, graph] = useD3(() => {
     const el = d3Element("svg");
-    const svg = d3
-      .select((el as any) as HTMLElement)
-      .attr("width", 600)
-      .attr("height", 400);
+    const svg = d3.select(el).attr("width", 600).attr("height", 400);
     const graph = svg.append("g").attr("transform", `translate(${25},${50})`);
     return [el, graph];
   }, []);
