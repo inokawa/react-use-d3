@@ -91,8 +91,9 @@ class FauxStyle {
   }
 
   setProperty: CSSStyleDeclaration["setProperty"] = (name, value) => {
+    const hasUpdate = this.getPropertyValue(name) !== value;
     this.style[styleToPropName(name)] = value;
-    if (this.ref.current) {
+    if (this.ref.current && hasUpdate) {
       this.ref.current.style.setProperty(name, value);
     }
   };
@@ -153,13 +154,8 @@ export class D3Element {
     if (name === "style") {
       if (isString(value)) {
         const styles = styleAttr.parse(value);
-
         for (const key in styles) {
-          const hasUpdate = this.style.getPropertyValue(key) !== styles[key];
           this.style.setProperty(key, styles[key]);
-          if (this.ref.current && hasUpdate) {
-            this.ref.current.style.setProperty(key, styles[key]);
-          }
         }
       }
     } else {
@@ -220,9 +216,7 @@ export class D3Element {
   };
 
   appendChild(el: D3Element) {
-    // if (el instanceof FauxElement) {
     el.parentNode = this;
-    // }
 
     this.childNodes.push(el);
     return el;
