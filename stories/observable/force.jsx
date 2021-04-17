@@ -83,9 +83,5 @@ export default ({ width, height, data }) => {
     return [svg.node(), sim];
   }, [width, height]);
 
-  useEffect(() => {
-    return () => sim.stop();
-  }, []);
-
   return e.toReact();
 };
