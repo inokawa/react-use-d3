@@ -1,4 +1,3 @@
-import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import pkg from "./package.json";
 
@@ -14,5 +13,6 @@ export default {
       format: "es",
     },
   ],
-  plugins: [commonjs(), typescript()],
+  external: Object.keys(pkg.dependencies),
+  plugins: [typescript()],
 };
