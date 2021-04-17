@@ -2,6 +2,7 @@ import React, { Fragment, useState } from "react";
 import Bars from "./observable/bars";
 import Force from "./observable/force";
 import Stream, { options as streamOptions } from "./observable/stream";
+import Sunburst from "./observable/sunburst";
 import TransitionCircle from "./observable/transition-end";
 import {
   TweenNumber,
@@ -69,6 +70,17 @@ export const StreamGraph = () => {
         </select>
       </div>
       <Stream width={900} height={500} mode={mode} />
+    </div>
+  );
+};
+
+export const ZoomableSunburst = () => {
+  const url = "https://observablehq.com/@d3/zoomable-sunburst";
+
+  return (
+    <div>
+      <a href={url}>{url}</a>
+      <Sunburst />
     </div>
   );
 };
