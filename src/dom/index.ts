@@ -294,14 +294,6 @@ export class D3Element {
   }
   getElementByIdNS = (ns: string, id: string) => this.getElementById(id);
 
-  getBoundingClientRect = () => {
-    if (!this.ref.current) {
-      return undefined;
-    }
-
-    return this.ref.current.getBoundingClientRect();
-  };
-
   cloneNode(deep: boolean = true): D3Element {
     const el = new D3Element(
       this.nodeName,
@@ -320,6 +312,14 @@ export class D3Element {
     }
     return el;
   }
+
+  getBoundingClientRect = () => {
+    if (!this.ref.current) {
+      return undefined;
+    }
+
+    return this.ref.current.getBoundingClientRect();
+  };
 
   compareDocumentPosition(other: D3Element): number {
     if (this === other) {
@@ -358,6 +358,13 @@ export class D3Element {
     if (!siblings) return;
     const me = siblings.indexOf(this);
     return siblings[me - 1];
+  }
+
+  get clientLeft() {
+    return this.ref.current?.clientLeft;
+  }
+  get clientTop() {
+    return this.ref.current?.clientTop;
   }
 
   get innerHTML() {
@@ -405,14 +412,14 @@ export class D3Element {
         createElement(
           this.nodeName,
           {
-            ref: this.ref,
-            key: this.id,
             ...attrs,
             ...Object.keys(this.eventListeners).reduce((acc, k) => {
               acc[k] = mapEventListener(self, this.eventListeners[k]);
               return acc;
             }, {} as { [key: string]: (syntheticEvent: React.SyntheticEvent) => void }),
             style,
+            ref: this.ref,
+            key: this.id,
           },
           this.text || this.children.map((el) => el.toReact())
         ),
