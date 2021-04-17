@@ -1,10 +1,8 @@
 import { useRef } from "react";
-import * as d3 from "d3";
-import { FauxElement } from "./faux-dom";
+import { D3Element } from "./dom";
 
-export const createElement = (name: string) => {
-  return new FauxElement(name);
-  //   return d3.select((el as any) as HTMLElement);
+export const d3Element = (name: string) => {
+  return new D3Element(name);
 };
 
 export const useD3 = <T, U>(recipe: () => T, deps: U[]): T => {

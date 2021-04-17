@@ -1,14 +1,14 @@
 import React, { forwardRef, useState, useImperativeHandle } from "react";
 
-type FauxNodeProps = {
+type D3NodeProps = {
   children: React.ReactElement;
 };
 
-export type FauxNodeHandle = {
+export type D3NodeHandle = {
   hide: () => void;
 };
 
-export const FauxNode = forwardRef<FauxNodeHandle, FauxNodeProps>(
+export const D3Node = forwardRef<D3NodeHandle, D3NodeProps>(
   ({ children }, ref) => {
     const [show, setShow] = useState(true);
     useImperativeHandle(

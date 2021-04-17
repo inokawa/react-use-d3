@@ -11,14 +11,14 @@ import {
   attrToPropName,
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
-import { FauxNode, FauxNodeHandle } from "./component";
+import { D3Node, D3NodeHandle } from "./component";
 
 const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
 };
 
 const mapEventListener = (
-  self: FauxElement,
+  self: D3Element,
   listeners: EventListenerOrEventListenerObject[]
 ) => (syntheticEvent: React.SyntheticEvent) => {
   let event: Event;
@@ -33,7 +33,7 @@ const mapEventListener = (
   });
 };
 
-function isAncestor(source: FauxElement, target: FauxElement): boolean {
+function isAncestor(source: D3Element, target: D3Element): boolean {
   while (target.parentNode) {
     target = target.parentNode;
     if (target === source) {
@@ -44,11 +44,11 @@ function isAncestor(source: FauxElement, target: FauxElement): boolean {
 }
 
 function getFirstNodeByOrder(
-  nodes: FauxElement[],
-  nodeOne: FauxElement,
-  nodeTwo: FauxElement
-): FauxElement | false {
-  return nodes.reduce((result: FauxElement | false, node) => {
+  nodes: D3Element[],
+  nodeOne: D3Element,
+  nodeTwo: D3Element
+): D3Element | false {
+  return nodes.reduce((result: D3Element | false, node) => {
     if (result !== false) {
       return result;
     } else if (node === nodeOne) {
@@ -63,7 +63,7 @@ function getFirstNodeByOrder(
   }, false);
 }
 
-function eitherContains(left: FauxElement, right: FauxElement): number | false {
+function eitherContains(left: D3Element, right: D3Element): number | false {
   return isAncestor(left, right)
     ? DOCUMENT_POSITION.CONTAINED_BY + DOCUMENT_POSITION.FOLLOWING
     : isAncestor(right, left)
@@ -71,7 +71,7 @@ function eitherContains(left: FauxElement, right: FauxElement): number | false {
     : false;
 }
 
-function getRootNode(node: FauxElement): FauxElement {
+function getRootNode(node: D3Element): D3Element {
   while (node.parentNode) {
     node = node.parentNode;
   }
@@ -99,23 +99,23 @@ class FauxStyle {
   };
 }
 
-export class FauxElement {
+export class D3Element {
   id: string;
   ref = createRef<HTMLElement>();
-  mountRef = createRef<FauxNodeHandle>();
+  mountRef = createRef<D3NodeHandle>();
 
   nodeType: number;
   nodeName: string;
   text: string;
-  parentNode?: FauxElement;
-  childNodes: FauxElement[];
+  parentNode?: D3Element;
+  childNodes: D3Element[];
   attrs: { [key: string]: string | null };
   style: FauxStyle;
   eventListeners: { [key: string]: EventListenerOrEventListenerObject[] };
 
   constructor(
     nodeName: string,
-    parentNode?: FauxElement,
+    parentNode?: D3Element,
     nodeType: number = ELEMENT_NODE,
     attrs: { [key: string]: string | null } = {},
     styles: { [key: string]: string | null } = {}
@@ -211,7 +211,7 @@ export class FauxElement {
     }
   };
 
-  appendChild(el: FauxElement) {
+  appendChild(el: D3Element) {
     // if (el instanceof FauxElement) {
     el.parentNode = this;
     // }
@@ -220,7 +220,7 @@ export class FauxElement {
     return el;
   }
 
-  insertBefore(el: FauxElement, before: FauxElement) {
+  insertBefore(el: D3Element, before: D3Element) {
     const index = this.childNodes.indexOf(before);
     el.parentNode = this;
 
@@ -233,7 +233,7 @@ export class FauxElement {
     return el;
   }
 
-  removeChild(child: FauxElement) {
+  removeChild(child: D3Element) {
     const target = this.childNodes.indexOf(child);
     this.childNodes.splice(target, 1);
     child.unmount();
@@ -251,7 +251,7 @@ export class FauxElement {
     return querySelectorAll(selector, this);
   }
 
-  getElementsByTagName(nodeName: string): FauxElement[] {
+  getElementsByTagName(nodeName: string): D3Element[] {
     const children = this.children;
 
     if (children.length === 0) {
@@ -275,7 +275,7 @@ export class FauxElement {
   getElementsByTagNameNS = (ns: string, nodeName: string) =>
     this.getElementsByTagName(nodeName);
 
-  getElementById(id: string): FauxElement | null {
+  getElementById(id: string): D3Element | null {
     const children = this.children;
 
     if (children.length === 0) {
@@ -302,8 +302,8 @@ export class FauxElement {
     return this.ref.current.getBoundingClientRect();
   };
 
-  cloneNode(deep: boolean = true): FauxElement {
-    const el = new FauxElement(
+  cloneNode(deep: boolean = true): D3Element {
+    const el = new D3Element(
       this.nodeName,
       this.parentNode,
       this.nodeType,
@@ -321,7 +321,7 @@ export class FauxElement {
     return el;
   }
 
-  compareDocumentPosition(other: FauxElement): number {
+  compareDocumentPosition(other: D3Element): number {
     if (this === other) {
       return 0;
     }
@@ -395,7 +395,7 @@ export class FauxElement {
     const self = this;
 
     return createElement(
-      FauxNode,
+      D3Node,
       // @ts-expect-error
       {
         ref: this.mountRef,
@@ -422,15 +422,15 @@ export class FauxElement {
 }
 
 const FauxWindow = {
-  getComputedStyle: (node: FauxElement) => ({
+  getComputedStyle: (node: D3Element) => ({
     getPropertyValue: node.style.getPropertyValue,
   }),
 };
 
 const FauxDocument = {
-  Element: FauxElement,
+  Element: D3Element,
   defaultView: FauxWindow,
-  createElement: (nodeName: string) => new FauxElement(nodeName),
+  createElement: (nodeName: string) => new D3Element(nodeName),
   createElementNS: function (ns: string, nodeName: string) {
     return this.createElement(nodeName);
   },
@@ -440,4 +440,4 @@ const FauxDocument = {
 };
 
 // @ts-expect-error
-FauxElement.prototype.ownerDocument = FauxDocument;
+D3Element.prototype.ownerDocument = FauxDocument;

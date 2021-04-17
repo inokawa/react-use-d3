@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useD3, createElement } from "../src";
+import { useD3, d3Element } from "../src";
 import * as d3 from "d3";
 
 export default {
@@ -29,7 +29,7 @@ export const Letters = () => {
   }, []);
 
   const [e, graph] = useD3(() => {
-    const el = createElement("svg");
+    const el = d3Element("svg");
     const svg = d3
       .select((el as any) as HTMLElement)
       .attr("width", 600)

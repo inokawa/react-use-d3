@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useD3, createElement } from "../../src";
+import { useD3, d3Element } from "../../src";
 import * as d3 from "d3";
 
 const color = (() => {
@@ -34,7 +34,7 @@ const drag = (simulation) => {
 
 export default ({ width, height, data }) => {
   const [e, sim] = useD3(() => {
-    const el = createElement("svg");
+    const el = d3Element("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
     const links = data.links.map((d) => Object.create(d));
     const nodes = data.nodes.map((d) => Object.create(d));

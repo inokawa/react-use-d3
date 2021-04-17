@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { useD3, createElement } from "../../src";
+import { useD3, d3Element } from "../../src";
 import * as d3 from "d3";
 
 const bumps = (() => {
@@ -68,7 +68,7 @@ export default ({ width, height, mode }) => {
   }, [y, stack]);
 
   const [e, path] = useD3(() => {
-    const el = createElement("svg");
+    const el = d3Element("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
 
     const path = svg

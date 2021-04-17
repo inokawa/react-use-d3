@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useD3, createElement } from "../../src";
+import { useD3, d3Element } from "../../src";
 import * as d3 from "d3";
 
 // Returns an array of m psuedorandom, smoothly-varying non-negative numbers.
@@ -76,7 +76,7 @@ export default ({ width, height, layout }) => {
   );
 
   const [e, rect] = useD3(() => {
-    const el = createElement("svg");
+    const el = d3Element("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
     const rect = svg
       .selectAll("g")
