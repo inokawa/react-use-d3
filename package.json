@@ -1,6 +1,6 @@
 {
   "name": "react-use-d3",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A small React hook to use D3 in declarative way, for data visualization & flexible animation.",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
