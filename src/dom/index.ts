@@ -379,6 +379,9 @@ export class D3Element {
   }
   set textContent(text: string) {
     this.text = text;
+    if (this.ref.current) {
+      this.ref.current.textContent = text;
+    }
   }
 
   get children() {
