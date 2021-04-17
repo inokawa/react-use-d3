@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useD3, d3Element } from "../src";
+import { useD3, d3Element } from "../../src";
 import * as d3 from "d3";
 
 const n = 4002;

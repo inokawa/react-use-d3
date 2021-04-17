@@ -1,15 +1,15 @@
 import React, { Fragment, useState } from "react";
-import Bars from "./observable/bars";
-import Force from "./observable/force";
-import Stream, { options as streamOptions } from "./observable/stream";
-import Sunburst from "./observable/sunburst";
-import TransitionCircle from "./observable/transition-end";
+import Bars from "./components/bars";
+import Force from "./components/force";
+import Stream, { options as streamOptions } from "./components/stream";
+import Sunburst from "./components/sunburst";
+import TransitionCircle from "./components/transition-end";
 import {
   TweenNumber,
   TweenFormattedNumber,
   TweenTextAppearance,
-} from "./observable/transition-texttween";
-import TransitionChained from "./transition-chained";
+} from "./components/transition-texttween";
+import TransitionChained from "./components/transition-chained";
 
 export default {
   title: "example",
@@ -53,6 +53,17 @@ export const ForceDirectedGraph = () => {
   );
 };
 
+export const ZoomableSunburst = () => {
+  const url = "https://observablehq.com/@d3/zoomable-sunburst";
+
+  return (
+    <div>
+      <a href={url}>{url}</a>
+      <Sunburst />
+    </div>
+  );
+};
+
 export const StreamGraph = () => {
   const url = "https://observablehq.com/@d3/streamgraph-transitions";
   const [mode, setMode] = useState(streamOptions[3].name);
@@ -70,17 +81,6 @@ export const StreamGraph = () => {
         </select>
       </div>
       <Stream width={900} height={500} mode={mode} />
-    </div>
-  );
-};
-
-export const ZoomableSunburst = () => {
-  const url = "https://observablehq.com/@d3/zoomable-sunburst";
-
-  return (
-    <div>
-      <a href={url}>{url}</a>
-      <Sunburst />
     </div>
   );
 };
