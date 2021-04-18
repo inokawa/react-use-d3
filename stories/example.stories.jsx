@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from "react";
 import Bars from "./components/bars";
+import LineChart from "./components/linechart";
 import Force from "./components/force";
 import Stream, { options as streamOptions } from "./components/stream";
 import Sunburst from "./components/sunburst";
@@ -37,6 +38,17 @@ export const StackedToGroupedBars = () => {
         ))}
       </div>
       <Bars width={900} height={500} layout={layout} />
+    </div>
+  );
+};
+
+export const MultiLineChart = () => {
+  const url = "https://observablehq.com/@d3/multi-line-chart";
+
+  return (
+    <div>
+      <a href={url}>{url}</a>
+      <LineChart width={900} height={600} />
     </div>
   );
 };
