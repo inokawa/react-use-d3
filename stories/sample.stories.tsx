@@ -57,11 +57,10 @@ export const Letters = () => {
     }, 1000);
   }, []);
 
-  const [e, graph] = useD3((create) => {
-    const el = create("svg");
-    const svg = d3.select(el).attr("width", 600).attr("height", 400);
+  const [svg, graph] = useD3((create) => {
+    const svg = d3.select(create("svg")).attr("width", 600).attr("height", 400);
     const graph = svg.append("g").attr("transform", `translate(${25},${50})`);
-    return [el, graph];
+    return [svg, graph];
   }, []);
   useD3(() => {
     const t = graph.transition().duration(750);
@@ -96,7 +95,7 @@ export const Letters = () => {
   }, [graph, datas]);
   return (
     <div>
-      {e.toReact()}
+      {svg.node().toReact()}
       <style>
         {`
       text {

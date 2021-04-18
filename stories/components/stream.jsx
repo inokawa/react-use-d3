@@ -67,10 +67,11 @@ export default ({ width, height, mode }) => {
     return layers;
   }, [y, stack]);
 
-  const [e, path] = useD3(
+  const [svg, path] = useD3(
     (create) => {
-      const el = create("svg");
-      const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
+      const svg = d3
+        .select(create("svg"))
+        .attr("viewBox", [0, 0, width, height]);
 
       const path = svg
         .selectAll("path")
@@ -79,7 +80,7 @@ export default ({ width, height, mode }) => {
         .attr("d", area)
         .attr("fill", () => z(Math.random()));
 
-      return [svg.node(), path];
+      return [svg, path];
     },
     [width, height, area, randomize]
   );
@@ -101,5 +102,5 @@ export default ({ width, height, mode }) => {
     };
   }, [path, randomize]);
 
-  return e.toReact();
+  return svg.node().toReact();
 };

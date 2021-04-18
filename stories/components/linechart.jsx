@@ -70,11 +70,10 @@ export default ({ width, height }) => {
     [x, y]
   );
 
-  const [e, rect] = useD3(
+  const svg = useD3(
     (create) => {
-      const el = create("svg");
       const svg = d3
-        .select(el)
+        .select(create("svg"))
         .attr("viewBox", [0, 0, width, height])
         .style("overflow", "visible");
 
@@ -150,10 +149,10 @@ export default ({ width, height }) => {
         }
       }
 
-      return [el];
+      return svg;
     },
     [width, height]
   );
 
-  return e.toReact();
+  return svg.node().toReact();
 };

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useD3 } from "../../src";
 import * as d3 from "d3";
+import { svg } from "d3";
 
 const data = require("../flare-2.json");
 
@@ -42,13 +43,12 @@ function labelTransform(d) {
 }
 
 export default () => {
-  const [e] = useD3((create) => {
-    const el = create("svg");
+  const svg = useD3((create) => {
     const root = partition(data);
     root.each((d) => (d.current = d));
 
     const svg = d3
-      .select(el)
+      .select(create("svg"))
       .attr("viewBox", [0, 0, width, width])
       .style("font", "10px sans-serif");
 
@@ -152,8 +152,8 @@ export default () => {
         .attrTween("transform", (d) => () => labelTransform(d.current));
     }
 
-    return [svg.node()];
+    return svg;
   }, []);
 
-  return e.toReact();
+  return svg.node().toReact();
 };

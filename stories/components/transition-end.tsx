@@ -7,9 +7,8 @@ const r = 32;
 const h = r * 3;
 
 export default () => {
-  const [e, circle] = useD3((create) => {
-    const el = create("svg");
-    const svg = d3.select(el).attr("viewBox", [0, 0, w, h]);
+  const [svg, circle] = useD3((create) => {
+    const svg = d3.select(create("svg")).attr("viewBox", [0, 0, w, h]);
 
     const circle = svg
       .append("circle")
@@ -20,7 +19,7 @@ export default () => {
       .attr("stroke", "black")
       .attr("stroke-width", 2);
 
-    return [svg.node(), circle];
+    return [svg, circle];
   }, []);
 
   useEffect(() => {
@@ -47,5 +46,5 @@ export default () => {
     };
   }, []);
 
-  return e.toReact();
+  return svg.node().toReact();
 };

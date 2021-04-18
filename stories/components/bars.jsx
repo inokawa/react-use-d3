@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { useD3 } from "../../src";
 import * as d3 from "d3";
 
@@ -77,7 +77,9 @@ export default ({ width, height, layout }) => {
 
   const [svg, rect] = useD3(
     (create) => {
-      const svg = d3.select(create("svg")).attr("viewBox", [0, 0, width, height]);
+      const svg = d3
+        .select(create("svg"))
+        .attr("viewBox", [0, 0, width, height]);
       const rect = svg
         .selectAll("g")
         .data(y01z)
@@ -97,7 +99,7 @@ export default ({ width, height, layout }) => {
     [width, height]
   );
 
-  useEffect(() => {
+  useD3(() => {
     function transitionGrouped() {
       y.domain([0, yMax]);
 

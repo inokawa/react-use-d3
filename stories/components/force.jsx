@@ -33,10 +33,11 @@ const drag = (simulation) => {
 };
 
 export default ({ width, height, data }) => {
-  const [e, sim] = useD3(
+  const [svg, sim] = useD3(
     (create) => {
-      const el = create("svg");
-      const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
+      const svg = d3
+        .select(create("svg"))
+        .attr("viewBox", [0, 0, width, height]);
       const links = data.links.map((d) => Object.create(d));
       const nodes = data.nodes.map((d) => Object.create(d));
 
@@ -81,10 +82,10 @@ export default ({ width, height, data }) => {
         node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
       });
 
-      return [svg.node(), sim];
+      return [svg, sim];
     },
     [width, height]
   );
 
-  return e.toReact();
+  return svg.node().toReact();
 };
