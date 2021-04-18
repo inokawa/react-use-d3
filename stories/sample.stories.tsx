@@ -6,6 +6,35 @@ export default {
   title: "sample",
 };
 
+const Component = ({ width, height, data }) => {
+  const svg = useD3(
+    (create) => {
+      const svg = d3
+        .select(create("svg"))
+        .attr("width", width)
+        .attr("height", height);
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("fill", "black")
+        .text(data);
+      return svg;
+    },
+    [width, height, data]
+  );
+  return <div>{svg.node().toReact()}</div>;
+};
+
+export const HelloWorld = () => {
+  const [data, setData] = useState(1);
+  useEffect(() => {
+    const id = setInterval(() => setData((prev) => prev + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return <Component width={600} height={300} data={data} />;
+};
+
 const shuffle = ([...array]) => {
   for (let i = array.length - 1; i >= 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
