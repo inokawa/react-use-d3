@@ -20,7 +20,9 @@ export const TweenNumber = () => {
           .end();
       }
     })();
-    return () => div.selectAll("*").interrupt();
+    return () => {
+      div.selectAll("*").interrupt();
+    };
   }, [div]);
 
   return div.node().toReact();
@@ -54,7 +56,9 @@ export const TweenFormattedNumber = () => {
           .end();
       }
     })();
-    return () => div.selectAll("*").interrupt();
+    return () => {
+      div.selectAll("*").interrupt();
+    };
   }, [div]);
 
   return div.node().toReact();
@@ -91,7 +95,9 @@ export const TweenTextAppearance = () => {
           .end();
       }
     })();
-    return () => div.selectAll("*").interrupt();
+    return () => {
+      div.selectAll("*").interrupt();
+    };
   }, [div]);
 
   return div.node().toReact();
