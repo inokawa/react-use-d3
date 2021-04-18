@@ -45,7 +45,34 @@ npm install react-use-d3
 
 ## Usage
 
-TODO
+```jsx
+import * as d3 from "d3";
+import { useD3 } from "react-use-d3";
+
+export const Component = ({ width, height, data }) => {
+  const svg = useD3(
+    (create) => {
+      // create('foo') inits virtual element which accepts D3's mutations
+      const svg = d3
+        .select(create("svg"))
+        .attr("width", width)
+        .attr("height", height);
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("fill", "black")
+        .text(data);
+      return svg;
+    },
+    // deps of useD3 hook
+    // useD3 hook runs if some of deps are updated like useMemo / useEffect
+    [width, height, data]
+  );
+  // el.toReact() transforms virtual element into React element
+  return <div>{svg.node().toReact()}</div>;
+};
+```
 
 ## Limitations
 
