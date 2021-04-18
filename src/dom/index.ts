@@ -97,9 +97,11 @@ class FauxStyle {
       this.ref.current.style.setProperty(name, value);
     }
   };
+
   getPropertyValue: CSSStyleDeclaration["getPropertyValue"] = (name) => {
     return this.style[styleToPropName(name)] ?? "";
   };
+
   removeProperty: CSSStyleDeclaration["removeProperty"] = (name) => {
     const key = styleToPropName(name);
     const old = this.style[key];
@@ -143,9 +145,11 @@ export class D3Element {
   getAttr() {
     return { ...this.attrs };
   }
+
   getStyle() {
     return { ...this.style.style };
   }
+
   unmount() {
     this.mountRef.current?.hide();
   }
@@ -166,12 +170,14 @@ export class D3Element {
       }
     }
   };
+
   setAttributeNS: Element["setAttributeNS"] = (ns, ...args) =>
     this.setAttribute(...args);
 
   getAttribute: Element["getAttribute"] = (name) => {
     return this.attrs[attrToPropName(name)];
   };
+
   getAttributeNS: Element["getAttributeNS"] = (ns, ...args) =>
     this.getAttribute(...args);
 
@@ -185,6 +191,7 @@ export class D3Element {
     }
     return null;
   };
+
   getAttributeNodeNS: Element["getAttributeNodeNS"] = (ns, ...args) =>
     this.getAttributeNode(...args);
 
@@ -195,6 +202,7 @@ export class D3Element {
       this.ref.current?.removeAttribute(name);
     }
   };
+
   removeAttributeNS: Element["removeAttributeNS"] = (ns, ...args) =>
     this.removeAttribute(...args);
 
@@ -278,6 +286,7 @@ export class D3Element {
       return matches.concat.apply(matches, childMatches);
     }
   }
+
   getElementsByTagNameNS = (ns: string, nodeName: string) =>
     this.getElementsByTagName(nodeName);
 
@@ -298,6 +307,7 @@ export class D3Element {
       }
     }
   }
+
   getElementByIdNS = (ns: string, id: string) => this.getElementById(id);
 
   cloneNode(deep: boolean = true): D3Element {
@@ -359,6 +369,7 @@ export class D3Element {
   get ownerDocument() {
     return FauxDocument;
   }
+
   get ownerSVGElement() {
     let target: D3Element = this;
     while (target.parentNode) {
@@ -387,6 +398,7 @@ export class D3Element {
   get clientLeft() {
     return this.ref.current?.clientLeft;
   }
+
   get clientTop() {
     return this.ref.current?.clientTop;
   }
@@ -394,6 +406,7 @@ export class D3Element {
   get innerHTML() {
     return this.text;
   }
+
   set innerHTML(text: string) {
     this.text = text;
   }
@@ -401,6 +414,7 @@ export class D3Element {
   get textContent() {
     return this.text;
   }
+
   set textContent(text: string) {
     this.text = text;
     if (this.ref.current) {
