@@ -419,7 +419,7 @@ export class D3Element {
     });
   }
 
-  toReact(): React.ReactNode {
+  toReact(): React.ReactElement {
     const attrs = this.getAttr();
     const style = this.getStyle();
 
