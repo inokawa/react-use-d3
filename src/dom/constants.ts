@@ -9,8 +9,6 @@ export const DOCUMENT_POSITION = {
   IMPLEMENTATION_SPECIFIC: 32,
 } as const;
 
-// This was easy to do with Vim.
-// Just saying.
 export const EVENT_NAME_MAPPING = {
   blur: "onBlur",
   change: "onChange",

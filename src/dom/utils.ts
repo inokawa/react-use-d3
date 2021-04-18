@@ -23,7 +23,10 @@ export function isUndefined(value: any): value is undefined {
 }
 
 export const eventToPropName = (name: string): string => {
-  return (EVENT_NAME_MAPPING as any)[name] || name;
+  return (
+    (EVENT_NAME_MAPPING as any)[name] ||
+    "on" + name.slice(0, 1).toUpperCase() + name.slice(1)
+  );
 };
 
 const SKIP_ATTR_EXP = [/^data-/, /^aria-/] as const;
