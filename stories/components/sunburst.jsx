@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useD3, d3Element } from "../../src";
+import { useD3 } from "../../src";
 import * as d3 from "d3";
 
 const data = require("../flare-2.json");
@@ -42,8 +42,8 @@ function labelTransform(d) {
 }
 
 export default () => {
-  const [e] = useD3(() => {
-    const el = d3Element("svg");
+  const [e] = useD3((create) => {
+    const el = create("svg");
     const root = partition(data);
     root.each((d) => (d.current = d));
 

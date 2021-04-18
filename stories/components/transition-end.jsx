@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useD3, d3Element } from "../../src";
+import { useD3 } from "../../src";
 import * as d3 from "d3";
 
 const w = 640;
@@ -7,8 +7,8 @@ const r = 32;
 const h = r * 3;
 
 export default () => {
-  const [e, circle] = useD3(() => {
-    const el = d3Element("svg");
+  const [e, circle] = useD3((create) => {
+    const el = create("svg");
     const svg = d3.select(el).attr("viewBox", [0, 0, w, h]);
 
     const circle = svg

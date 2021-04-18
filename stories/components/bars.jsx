@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useD3, d3Element } from "../../src";
+import { useD3 } from "../../src";
 import * as d3 from "d3";
 
 // Returns an array of m psuedorandom, smoothly-varying non-negative numbers.
@@ -75,25 +75,27 @@ export default ({ width, height, layout }) => {
     [height]
   );
 
-  const [e, rect] = useD3(() => {
-    const el = d3Element("svg");
-    const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
-    const rect = svg
-      .selectAll("g")
-      .data(y01z)
-      .join("g")
-      .attr("fill", (d, i) => z(i))
-      .selectAll("rect")
-      .data((d) => d)
-      .join("rect")
-      .attr("x", (d, i) => x(i))
-      .attr("y", height - margin.bottom)
-      .attr("width", x.bandwidth())
-      .attr("height", 0);
-    svg.append("g").call(xAxis);
+  const [svg, rect] = useD3(
+    (create) => {
+      const svg = d3.select(create("svg")).attr("viewBox", [0, 0, width, height]);
+      const rect = svg
+        .selectAll("g")
+        .data(y01z)
+        .join("g")
+        .attr("fill", (d, i) => z(i))
+        .selectAll("rect")
+        .data((d) => d)
+        .join("rect")
+        .attr("x", (d, i) => x(i))
+        .attr("y", height - margin.bottom)
+        .attr("width", x.bandwidth())
+        .attr("height", 0);
+      svg.append("g").call(xAxis);
 
-    return [el, rect];
-  }, [width, height]);
+      return [svg, rect];
+    },
+    [width, height]
+  );
 
   useEffect(() => {
     function transitionGrouped() {
@@ -128,5 +130,5 @@ export default ({ width, height, layout }) => {
     else transitionGrouped();
   }, [rect, layout]);
 
-  return e.toReact();
+  return svg.node().toReact();
 };

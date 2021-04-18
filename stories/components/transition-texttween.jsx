@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { useD3, d3Element } from "../../src";
+import { useD3 } from "../../src";
 import * as d3 from "d3";
 
 export const TweenNumber = () => {
-  const div = useD3(() => {
+  const div = useD3((create) => {
     return d3
-      .select(d3Element("div"))
+      .select(create("div"))
       .style("font-family", "sans-serif")
       .style("font-variant-numeric", "tabular-nums");
   }, []);
@@ -30,9 +30,9 @@ const random = d3.randomUniform(1e5, 1e7);
 const format = d3.format(".3s");
 
 export const TweenFormattedNumber = () => {
-  const div = useD3(() => {
+  const div = useD3((create) => {
     return d3
-      .select(d3Element("div"))
+      .select(create("div"))
       .style("font-family", "sans-serif")
       .style("font-variant-numeric", "tabular-nums")
       .property("_current", random);
@@ -61,9 +61,9 @@ export const TweenFormattedNumber = () => {
 };
 
 export const TweenTextAppearance = () => {
-  const div = useD3(() => {
+  const div = useD3((create) => {
     return d3
-      .select(d3Element("div"))
+      .select(create("div"))
       .style("font-family", "var(--sans-serif)")
       .style("position", "relative")
       .text("before");

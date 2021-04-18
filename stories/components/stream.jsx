@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { useD3, d3Element } from "../../src";
+import { useD3 } from "../../src";
 import * as d3 from "d3";
 
 const bumps = (() => {
@@ -67,19 +67,22 @@ export default ({ width, height, mode }) => {
     return layers;
   }, [y, stack]);
 
-  const [e, path] = useD3(() => {
-    const el = d3Element("svg");
-    const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
+  const [e, path] = useD3(
+    (create) => {
+      const el = create("svg");
+      const svg = d3.select(el).attr("viewBox", [0, 0, width, height]);
 
-    const path = svg
-      .selectAll("path")
-      .data(randomize)
-      .join("path")
-      .attr("d", area)
-      .attr("fill", () => z(Math.random()));
+      const path = svg
+        .selectAll("path")
+        .data(randomize)
+        .join("path")
+        .attr("d", area)
+        .attr("fill", () => z(Math.random()));
 
-    return [svg.node(), path];
-  }, [width, height, area, randomize]);
+      return [svg.node(), path];
+    },
+    [width, height, area, randomize]
+  );
 
   useEffect(() => {
     (async () => {

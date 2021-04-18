@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useD3, d3Element } from "../src";
+import { useD3 } from "../src";
 import * as d3 from "d3";
 
 export default {
@@ -28,8 +28,8 @@ export const Letters = () => {
     }, 1000);
   }, []);
 
-  const [e, graph] = useD3(() => {
-    const el = d3Element("svg");
+  const [e, graph] = useD3((create) => {
+    const el = create("svg");
     const svg = d3.select(el).attr("width", 600).attr("height", 400);
     const graph = svg.append("g").attr("transform", `translate(${25},${50})`);
     return [el, graph];

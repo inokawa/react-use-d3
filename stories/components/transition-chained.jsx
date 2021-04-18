@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useD3, d3Element } from "../../src";
+import { useD3 } from "../../src";
 import * as d3 from "d3";
 
 const n = 4002;
@@ -9,8 +9,8 @@ const blueorange = d3.interpolateRgb("steelblue", "orange");
 const orangewhite = d3.interpolateRgb("orange", "#eee");
 
 export default () => {
-  const [div] = useD3(() => {
-    const div = d3.select(d3Element("div"));
+  const [div] = useD3((create) => {
+    const div = d3.select(create("div"));
     div
       .selectAll("div")
       .data(d3.range(n))
