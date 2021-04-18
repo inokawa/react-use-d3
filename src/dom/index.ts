@@ -317,11 +317,7 @@ export class D3Element {
   }
 
   getBoundingClientRect = () => {
-    if (!this.ref.current) {
-      return undefined;
-    }
-
-    return this.ref.current.getBoundingClientRect();
+    return this.ref.current?.getBoundingClientRect();
   };
 
   compareDocumentPosition(other: D3Element): number {
@@ -347,6 +343,28 @@ export class D3Element {
       : first === other
       ? DOCUMENT_POSITION.PRECEDING
       : DOCUMENT_POSITION.DISCONNECTED;
+  }
+
+  createSVGPoint() {
+    return (this.ref.current as any)?.createSVGPoint();
+  }
+
+  getScreenCTM() {
+    return (this.ref.current as any)?.getScreenCTM();
+  }
+
+  get ownerDocument() {
+    return FauxDocument;
+  }
+  get ownerSVGElement() {
+    let target: D3Element = this;
+    while (target.parentNode) {
+      target = target.parentNode;
+      if (target.nodeName === "svg") {
+        return target;
+      }
+    }
+    return null;
   }
 
   get nextSibling() {
@@ -451,6 +469,3 @@ const FauxDocument = {
   // 8 = DOCUMENT_POSITION_CONTAINS, so we say all nodes are in this document.
   compareDocumentPosition: () => DOCUMENT_POSITION.CONTAINS,
 };
-
-// @ts-expect-error
-D3Element.prototype.ownerDocument = FauxDocument;
