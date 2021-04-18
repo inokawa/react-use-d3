@@ -20,8 +20,8 @@ export const useD3 = <T, U>(
     }
     return resRef.current;
   }
-  depsRef.current = deps;
   resRef.current = recipe(d3Element);
+  depsRef.current = deps;
 
   return resRef.current;
 };
