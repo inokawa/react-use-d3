@@ -189,8 +189,11 @@ export class D3Element {
     this.getAttributeNode(...args);
 
   removeAttribute: Element["removeAttribute"] = (name) => {
+    const hasUpdate = !isUndefined(this.attrs[attrToPropName(name)]);
     delete this.attrs[attrToPropName(name)];
-    this.ref.current?.removeAttribute(name);
+    if (hasUpdate) {
+      this.ref.current?.removeAttribute(name);
+    }
   };
   removeAttributeNS: Element["removeAttributeNS"] = (ns, ...args) =>
     this.removeAttribute(...args);
