@@ -126,19 +126,21 @@ export class D3Element {
 
   constructor(
     nodeName: string,
-    parentNode?: D3Element,
-    nodeType: number = ELEMENT_NODE,
-    attrs: { [key: string]: string | null } = {},
-    styles: { [key: string]: string | null } = {}
+    initialValues?: {
+      parentNode?: D3Element;
+      nodeType: number;
+      attrs: { [key: string]: string | null };
+      styles: { [key: string]: string | null };
+    }
   ) {
     this.id = generateId();
     this.nodeName = nodeName;
-    this.nodeType = nodeType;
-    this.parentNode = parentNode;
+    this.nodeType = initialValues?.nodeType ?? ELEMENT_NODE;
+    this.parentNode = initialValues?.parentNode;
     this.childNodes = [];
     this.text = "";
-    this.attrs = attrs;
-    this.style = new FauxStyle(this.ref, styles);
+    this.attrs = initialValues?.attrs ?? {};
+    this.style = new FauxStyle(this.ref, initialValues?.styles ?? {});
     this.eventListeners = {};
   }
 
@@ -311,13 +313,12 @@ export class D3Element {
   getElementByIdNS = (ns: string, id: string) => this.getElementById(id);
 
   cloneNode(deep: boolean = true): D3Element {
-    const el = new D3Element(
-      this.nodeName,
-      this.parentNode,
-      this.nodeType,
-      this.getAttr(),
-      this.getStyle()
-    );
+    const el = new D3Element(this.nodeName, {
+      nodeType: this.nodeType,
+      parentNode: this.parentNode,
+      attrs: this.getAttr(),
+      styles: this.getStyle(),
+    });
 
     if (deep) {
       el.childNodes = this.childNodes.map((c) => {
