@@ -298,14 +298,14 @@ export class D3Element {
     if (children.length === 0) {
       return null;
     } else {
-      const match = children.filter((el) => el.getAttribute("id") === id)[0];
+      const match = children.find((el) => el.getAttribute("id") === id);
 
       if (match) {
         return match;
       } else {
         const childMatches = children.map((el) => el.getElementById(id));
 
-        return childMatches.filter((match) => match !== null)[0] || null;
+        return childMatches.find((match) => match !== null) || null;
       }
     }
   }
