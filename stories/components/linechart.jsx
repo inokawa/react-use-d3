@@ -42,7 +42,7 @@ export default ({ width, height }) => {
           .ticks(width / 80)
           .tickSizeOuter(0)
       ),
-    [width, height]
+    [x, width, height]
   );
   const yAxis = useCallback(
     (g) =>
@@ -59,7 +59,7 @@ export default ({ width, height }) => {
             .attr("font-weight", "bold")
             .text(data.y)
         ),
-    []
+    [y]
   );
   const line = useCallback(
     d3

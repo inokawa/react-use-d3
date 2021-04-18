@@ -190,6 +190,7 @@ export class D3Element {
 
   removeAttribute: Element["removeAttribute"] = (name) => {
     delete this.attrs[attrToPropName(name)];
+    this.ref.current?.removeAttribute(name);
   };
   removeAttributeNS: Element["removeAttributeNS"] = (ns, ...args) =>
     this.removeAttribute(...args);
