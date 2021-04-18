@@ -12,7 +12,7 @@ D3 is an excellent library to do data-driven visualization.
 React is a nice library to create user interfaces in data-driven way.
 So why not use them together?
 
-Well, integrating D3 into React was tried by many but it looks that no one succeeded to do it perfectly. I think it's because of many mismatches between them.
+Well, integrating D3 into React was tried by many. Someone uses a part of D3's possibilities in React but it looks that no one succeeded to port all of them. I think it's because of mismatches between D3 and React.
 
 - React does DOM manipulation through virtual DOM but D3 does it directly with its own data binding system.
 - React is only for UI but D3 has everything for visualization.
