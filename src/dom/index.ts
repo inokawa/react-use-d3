@@ -20,7 +20,6 @@ import {
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 
 type D3NodeHandle = {
-  hide: () => void;
   refresh: () => void;
 };
 
@@ -167,10 +166,6 @@ export class D3Element {
     return { ...this.style.style };
   }
 
-  unmount() {
-    this.mountRef.current?.hide();
-  }
-
   setAttribute: Element["setAttribute"] = (name, value) => {
     if (name === "style") {
       if (isString(value)) {
@@ -271,7 +266,7 @@ export class D3Element {
   removeChild(child: D3Element) {
     const target = this.childNodes.indexOf(child);
     this.childNodes.splice(target, 1);
-    // child.unmount();
+    this.mountRef.current?.refresh();
   }
 
   querySelector(selector: string) {
@@ -464,20 +459,19 @@ export class D3Element {
   }
 
   D3Node = forwardRef<D3NodeHandle>((props, ref) => {
-    const [show, setShow] = useState(true);
     const [_, setRefresh] = useState({});
     useImperativeHandle(
       ref,
       () => ({
-        hide: () => setShow(false),
         refresh: () => setRefresh({}),
       }),
-      [setShow, setRefresh]
+      [setRefresh]
     );
-    return show ? this.renderElement() : null;
+    return this.renderElement();
   });
 
-  renderElement(): React.ReactElement {
+  renderElement(): React.ReactElement | null {
+    if (this.nodeName !== "svg" && !this.parentNode) return null;
     const attrs = this.getAttr();
     const style = this.getStyle();
     return createElement(
