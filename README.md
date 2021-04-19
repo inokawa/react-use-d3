@@ -91,10 +91,10 @@ TODO
   - [ ] d3-path
   - [ ] d3-chord
   - [ ] d3-axis
-  - [ ] d3-drag
+  - [x] d3-drag
   - [ ] d3-brush
   - [ ] d3-zoom
-  - [ ] d3-force
+  - [x] d3-force
   - [ ] d3-contour
   - [ ] d3-geo
   - [ ] d3-tile
