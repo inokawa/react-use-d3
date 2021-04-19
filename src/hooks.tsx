@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { D3Element } from "./dom";
 
 const d3Element = (name: string): HTMLElement & Pick<D3Element, "toReact"> => {
-  return new D3Element(name) as any;
+  return new D3Element(name, undefined, true) as any;
 };
 
 export const useD3 = <T, U>(

@@ -1,4 +1,11 @@
-import React, { createElement, createRef } from "react";
+import React, {
+  createElement,
+  createRef,
+  forwardRef,
+  useState,
+  useImperativeHandle,
+} from "react";
+
 // @ts-expect-error
 import * as styleAttr from "style-attr";
 // @ts-expect-error
@@ -11,7 +18,10 @@ import {
   attrToPropName,
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
-import { D3Node, D3NodeHandle } from "./component";
+
+type D3NodeHandle = {
+  flush: () => void;
+};
 
 const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
@@ -93,8 +103,8 @@ class FauxStyle {
   setProperty: CSSStyleDeclaration["setProperty"] = (name, value) => {
     const hasUpdate = this.getPropertyValue(name) !== value;
     this.style[styleToPropName(name)] = value;
-    if (this.ref.current && hasUpdate) {
-      this.ref.current.style.setProperty(name, value);
+    if (hasUpdate) {
+      this.ref.current?.style.setProperty(name, value);
     }
   };
 
@@ -105,13 +115,18 @@ class FauxStyle {
   removeProperty: CSSStyleDeclaration["removeProperty"] = (name) => {
     const key = styleToPropName(name);
     const old = this.style[key];
+    const hasUpdate = !isUndefined(old);
     delete this.style[key];
+    if (hasUpdate) {
+      this.ref.current?.style.removeProperty(name);
+    }
     return old ?? "";
   };
 }
 
 export class D3Element {
   id: string;
+  isRoot: boolean;
   ref = createRef<HTMLElement>();
   mountRef = createRef<D3NodeHandle>();
 
@@ -131,9 +146,11 @@ export class D3Element {
       nodeType: number;
       attrs: { [key: string]: string | null };
       styles: { [key: string]: string | null };
-    }
+    },
+    isRoot: boolean = false
   ) {
     this.id = generateId();
+    this.isRoot = isRoot;
     this.nodeName = nodeName;
     this.nodeType = initialValues?.nodeType ?? ELEMENT_NODE;
     this.parentNode = initialValues?.parentNode;
@@ -152,10 +169,6 @@ export class D3Element {
     return { ...this.style.style };
   }
 
-  unmount() {
-    this.mountRef.current?.hide();
-  }
-
   setAttribute: Element["setAttribute"] = (name, value) => {
     if (name === "style") {
       if (isString(value)) {
@@ -167,8 +180,8 @@ export class D3Element {
     } else {
       const hasUpdate = this.getAttribute(name) !== value;
       this.attrs[attrToPropName(name)] = value;
-      if (this.ref.current && hasUpdate) {
-        this.ref.current.setAttribute(name, value);
+      if (hasUpdate) {
+        this.ref.current?.setAttribute(name, value);
       }
     }
   };
@@ -230,9 +243,13 @@ export class D3Element {
   };
 
   appendChild(el: D3Element) {
+    if (el.parentNode) {
+      el.parentNode.removeChild(el);
+    }
     el.parentNode = this;
 
     this.childNodes.push(el);
+    this.mountRef.current?.flush();
     return el;
   }
 
@@ -252,7 +269,7 @@ export class D3Element {
   removeChild(child: D3Element) {
     const target = this.childNodes.indexOf(child);
     this.childNodes.splice(target, 1);
-    child.unmount();
+    this.mountRef.current?.flush();
   }
 
   querySelector(selector: string) {
@@ -438,34 +455,41 @@ export class D3Element {
   }
 
   toReact(): React.ReactElement {
+    return createElement(this.Mounter, {
+      ref: this.mountRef,
+      key: this.id,
+    });
+  }
+
+  Mounter = forwardRef<D3NodeHandle>((props, ref) => {
+    const [_, setFlush] = useState({});
+    useImperativeHandle(
+      ref,
+      () => ({
+        flush: () => setFlush({}),
+      }),
+      [setFlush]
+    );
+    return this.renderElement();
+  });
+
+  renderElement(): React.ReactElement | null {
+    if (!this.isRoot && !this.parentNode) return null;
     const attrs = this.getAttr();
     const style = this.getStyle();
-
-    const self = this;
-
     return createElement(
-      D3Node,
-      // @ts-expect-error
+      this.nodeName,
       {
-        ref: this.mountRef,
+        ...attrs,
+        ...Object.keys(this.eventListeners).reduce((acc, k) => {
+          acc[k] = mapEventListener(this, this.eventListeners[k]);
+          return acc;
+        }, {} as { [key: string]: (syntheticEvent: React.SyntheticEvent) => void }),
+        style,
+        ref: this.ref,
         key: this.id,
       },
-      [
-        createElement(
-          this.nodeName,
-          {
-            ...attrs,
-            ...Object.keys(this.eventListeners).reduce((acc, k) => {
-              acc[k] = mapEventListener(self, this.eventListeners[k]);
-              return acc;
-            }, {} as { [key: string]: (syntheticEvent: React.SyntheticEvent) => void }),
-            style,
-            ref: this.ref,
-            key: this.id,
-          },
-          this.text || this.children.map((el) => el.toReact())
-        ),
-      ]
+      this.text || this.children.map((el) => el.toReact())
     );
   }
 }
