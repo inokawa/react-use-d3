@@ -261,7 +261,7 @@ export class D3Element {
     } else {
       this.childNodes.push(el);
     }
-
+    this.mountRef.current?.flush();
     return el;
   }
 
