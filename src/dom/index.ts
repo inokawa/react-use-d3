@@ -126,6 +126,7 @@ class FauxStyle {
 
 export class D3Element {
   id: string;
+  isRoot: boolean;
   ref = createRef<HTMLElement>();
   mountRef = createRef<D3NodeHandle>();
 
@@ -145,9 +146,11 @@ export class D3Element {
       nodeType: number;
       attrs: { [key: string]: string | null };
       styles: { [key: string]: string | null };
-    }
+    },
+    isRoot: boolean = false
   ) {
     this.id = generateId();
+    this.isRoot = isRoot;
     this.nodeName = nodeName;
     this.nodeType = initialValues?.nodeType ?? ELEMENT_NODE;
     this.parentNode = initialValues?.parentNode;
@@ -471,7 +474,7 @@ export class D3Element {
   });
 
   renderElement(): React.ReactElement | null {
-    if (this.nodeName !== "svg" && !this.parentNode) return null;
+    if (!this.isRoot && !this.parentNode) return null;
     const attrs = this.getAttr();
     const style = this.getStyle();
     return createElement(
