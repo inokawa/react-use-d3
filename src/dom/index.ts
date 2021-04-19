@@ -245,6 +245,9 @@ export class D3Element {
   };
 
   appendChild(el: D3Element) {
+    if (el.parentNode) {
+      el.parentNode.removeChild(el);
+    }
     el.parentNode = this;
 
     this.childNodes.push(el);
@@ -268,7 +271,7 @@ export class D3Element {
   removeChild(child: D3Element) {
     const target = this.childNodes.indexOf(child);
     this.childNodes.splice(target, 1);
-    child.unmount();
+    // child.unmount();
   }
 
   querySelector(selector: string) {
