@@ -24,7 +24,7 @@ Almost all syntaxes of D3 would work.
 The elements created with D3 are transformed into React Elements and handled by React's reconciliation.
 Attribute updates are applied directly through ref for smooth animation.
 
-The core of this lib is based on [react-faux-dom](https://github.com/Olical/react-faux-dom), but customized to fit to the lifecycle of React and handle D3's transition correctly. Also rewritten in TypeScript and fixed to support newest D3.
+The core of this lib is based on [react-faux-dom](https://github.com/Olical/react-faux-dom), but highly customized to fit to the lifecycle of React and handle D3's transition correctly. Also rewritten in TypeScript and fixed to support newest D3.
 
 I'm trying to support D3's usecases as much as possible. If you notice some problems, I would appreciate if you could report it in a [issue](https://github.com/inokawa/react-use-d3/issues).
 
