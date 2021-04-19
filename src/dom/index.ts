@@ -20,7 +20,7 @@ import {
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 
 type D3NodeHandle = {
-  refresh: () => void;
+  flush: () => void;
 };
 
 const generateId = (): string => {
@@ -249,7 +249,7 @@ export class D3Element {
     el.parentNode = this;
 
     this.childNodes.push(el);
-    this.mountRef.current?.refresh();
+    this.mountRef.current?.flush();
     return el;
   }
 
@@ -269,7 +269,7 @@ export class D3Element {
   removeChild(child: D3Element) {
     const target = this.childNodes.indexOf(child);
     this.childNodes.splice(target, 1);
-    this.mountRef.current?.refresh();
+    this.mountRef.current?.flush();
   }
 
   querySelector(selector: string) {
@@ -455,20 +455,20 @@ export class D3Element {
   }
 
   toReact(): React.ReactElement {
-    return createElement(this.D3Node, {
+    return createElement(this.Mounter, {
       ref: this.mountRef,
       key: this.id,
     });
   }
 
-  D3Node = forwardRef<D3NodeHandle>((props, ref) => {
-    const [_, setRefresh] = useState({});
+  Mounter = forwardRef<D3NodeHandle>((props, ref) => {
+    const [_, setFlush] = useState({});
     useImperativeHandle(
       ref,
       () => ({
-        refresh: () => setRefresh({}),
+        flush: () => setFlush({}),
       }),
-      [setRefresh]
+      [setFlush]
     );
     return this.renderElement();
   });
