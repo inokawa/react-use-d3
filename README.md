@@ -107,3 +107,11 @@ TODO
 - [ ] Consider examples
 - [ ] Consider dependencies
 - [ ] Consider tests
+
+## Inspirations
+
+- [react-faux-dom](https://github.com/Olical/react-faux-dom)
+- [react-d3-library](https://github.com/react-d3-library/react-d3-library)
+- [d3-render](https://github.com/unkleho/d3-render)
+- [react-spring](https://github.com/pmndrs/react-spring)
+- [resonance](https://github.com/sghall/resonance)
