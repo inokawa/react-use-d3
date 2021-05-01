@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`react-dom normal 1`] = `
+<svg
+  height="400"
+  style={
+    Object {
+      "height": "400px",
+      "width": "600px",
+    }
+  }
+  width="600"
+>
+  <g
+    style={Object {}}
+  >
+    <rect
+      fill="none"
+      height="100"
+      stroke="red"
+      strokeWidth="1"
+      style={Object {}}
+      width="100"
+      x="0"
+      y="0"
+    />
+    <text
+      style={Object {}}
+    >
+      test
+    </text>
+  </g>
+</svg>
+`;
