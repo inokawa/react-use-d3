@@ -161,11 +161,11 @@ export class D3Element {
   }
 
   getAttr() {
-    return this.attrs;
+    return { ...this.attrs };
   }
 
   getStyle() {
-    return this.style.style;
+    return { ...this.style.style };
   }
 
   setAttribute: Element["setAttribute"] = (name, value) => {
@@ -332,8 +332,8 @@ export class D3Element {
     const el = new D3Element(this.nodeName, {
       nodeType: this.nodeType,
       parentNode: this.parentNode,
-      attrs: { ...this.getAttr() },
-      styles: { ...this.getStyle() },
+      attrs: this.getAttr(),
+      styles: this.getStyle(),
     });
 
     if (deep) {
