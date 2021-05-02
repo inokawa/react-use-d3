@@ -15,7 +15,7 @@
     "tsc:d": "tsc -p . --outDir lib -d --emitDeclarationOnly",
     "prepublishOnly": "rimraf lib && npm run build && npm run tsc:d",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "storybook:build": "build-storybook"
   },
   "peerDependencies": {
     "d3": "^4.0.0",
