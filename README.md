@@ -22,7 +22,7 @@ Well, integrating D3 into React was tried by many. Someone uses a part of D3's p
 I'm trying to give a nice intermediate with this lib.
 Almost all syntaxes of D3 would work.
 The elements created with D3 are transformed into React Elements and handled by React's reconciliation.
-Attribute updates are applied directly through ref for smooth animation.
+Attribute updates are applied directly through [ref](https://reactjs.org/docs/refs-and-the-dom.html) for smooth animation.
 
 The core of this lib is based on [react-faux-dom](https://github.com/Olical/react-faux-dom), but highly customized to fit to the lifecycle of React and handle D3's transition correctly. Also rewritten in TypeScript and fixed to support newest D3.
 
