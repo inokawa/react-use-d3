@@ -18,6 +18,10 @@ import {
 } from "./utils";
 import { ELEMENT_NODE, DOCUMENT_POSITION } from "./constants";
 
+export type NodeResolver = (
+  name: keyof JSX.IntrinsicElements
+) => string | React.ComponentClass;
+
 type D3NodeHandle = {
   flush: () => void;
 };
@@ -138,24 +142,24 @@ export class D3Element {
   eventListeners: { [key: string]: EventListenerOrEventListenerObject[] };
 
   constructor(
-    nodeName: string,
-    initialValues?: {
+    initialValues: {
+      nodeName: string;
       parentNode?: D3Element;
-      nodeType: number;
-      attrs: { [key: string]: string | null };
-      styles: { [key: string]: string | null };
+      nodeType?: number;
+      attrs?: { [key: string]: string | null };
+      styles?: { [key: string]: string | null };
     },
     isRoot: boolean = false
   ) {
     this.id = generateId();
     this.isRoot = isRoot;
-    this.nodeName = nodeName;
-    this.nodeType = initialValues?.nodeType ?? ELEMENT_NODE;
-    this.parentNode = initialValues?.parentNode;
+    this.nodeName = initialValues.nodeName;
+    this.nodeType = initialValues.nodeType ?? ELEMENT_NODE;
+    this.parentNode = initialValues.parentNode;
     this.childNodes = [];
     this.text = "";
-    this.attrs = initialValues?.attrs ?? {};
-    this.style = new FauxStyle(this.ref, initialValues?.styles ?? {});
+    this.attrs = initialValues.attrs ?? {};
+    this.style = new FauxStyle(this.ref, initialValues.styles ?? {});
     this.eventListeners = {};
   }
 
@@ -328,7 +332,8 @@ export class D3Element {
   getElementByIdNS = (ns: string, id: string) => this.getElementById(id);
 
   cloneNode(deep: boolean = true): D3Element {
-    const el = new D3Element(this.nodeName, {
+    const el = new D3Element({
+      nodeName: this.nodeName,
       nodeType: this.nodeType,
       parentNode: this.parentNode,
       attrs: this.getAttr(),
@@ -501,7 +506,7 @@ const FauxWindow = {
 const FauxDocument = {
   Element: D3Element,
   defaultView: FauxWindow,
-  createElement: (nodeName: string) => new D3Element(nodeName),
+  createElement: (nodeName: string) => new D3Element({ nodeName }),
   createElementNS: function (ns: string, nodeName: string) {
     return this.createElement(nodeName);
   },
