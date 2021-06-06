@@ -19,7 +19,7 @@
   },
   "peerDependencies": {
     "d3": "^4.0.0 || ^6.7.0",
-    "react": "^16.8.0"
+    "react": "^16.8.0 || ^17.0.2"
   },
   "dependencies": {
     "query-selector": "2.0.0",
