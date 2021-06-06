@@ -26,21 +26,20 @@ const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
 };
 
-const mapEventListener = (
-  self: D3Element,
-  listeners: EventListenerOrEventListenerObject[]
-) => (syntheticEvent: React.SyntheticEvent) => {
-  let event: Event;
+const mapEventListener =
+  (self: D3Element, listeners: EventListenerOrEventListenerObject[]) =>
+  (syntheticEvent: React.SyntheticEvent) => {
+    let event: Event;
 
-  if (syntheticEvent) {
-    event = syntheticEvent.nativeEvent;
-    (event as any).syntheticEvent = syntheticEvent;
-  }
+    if (syntheticEvent) {
+      event = syntheticEvent.nativeEvent;
+      (event as any).syntheticEvent = syntheticEvent;
+    }
 
-  listeners.forEach((listener) => {
-    (listener as any).call(self, event);
-  });
-};
+    listeners.forEach((listener) => {
+      (listener as any).call(self, event);
+    });
+  };
 
 function isAncestor(source: D3Element, target: D3Element): boolean {
   while (target.parentNode) {
@@ -387,7 +386,7 @@ export class D3Element {
     return FauxDocument;
   }
 
-  get ownerSVGElement() {
+  get ownerSVGElement(): D3Element | null {
     let target: D3Element = this;
     while (target.parentNode) {
       target = target.parentNode;
@@ -398,14 +397,14 @@ export class D3Element {
     return null;
   }
 
-  get nextSibling() {
+  get nextSibling(): D3Element | undefined {
     const siblings = this.parentNode?.children;
     if (!siblings) return;
     const me = siblings.indexOf(this);
     return siblings[me + 1];
   }
 
-  get previousSibling() {
+  get previousSibling(): D3Element | undefined {
     const siblings = this.parentNode?.children;
     if (!siblings) return;
     const me = siblings.indexOf(this);
