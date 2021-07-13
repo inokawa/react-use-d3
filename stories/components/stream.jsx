@@ -67,22 +67,19 @@ export default ({ width, height, mode }) => {
     return layers;
   }, [y, stack]);
 
-  const [svg, path] = useD3(
-    (create) => {
-      const svg = d3
-        .select(create("svg"))
-        .attr("viewBox", [0, 0, width, height]);
-
-      const path = svg
+  const svg = useD3(
+    (create) => d3.select(create("svg")).attr("viewBox", [0, 0, width, height]),
+    [width, height]
+  );
+  const path = useD3(
+    () =>
+      svg
         .selectAll("path")
         .data(randomize)
         .join("path")
         .attr("d", area)
-        .attr("fill", () => z(Math.random()));
-
-      return [svg, path];
-    },
-    [width, height, area, randomize]
+        .attr("fill", () => z(Math.random())),
+    [svg, area, randomize]
   );
 
   useEffect(() => {
