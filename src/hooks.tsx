@@ -15,10 +15,7 @@ export const useD3 = <T, U>(
     depsRef.current.length === deps.length &&
     depsRef.current.every((d, i) => d === deps[i])
   ) {
-    if (resRef.current === null) {
-      resRef.current = recipe(d3Element);
-    }
-    return resRef.current;
+    return resRef.current || (resRef.current = recipe(d3Element));
   }
   resRef.current = recipe(d3Element);
   depsRef.current = deps;
