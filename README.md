@@ -6,6 +6,8 @@ A small [React](https://github.com/facebook/react) hook to use [D3](https://gith
 
 **This is under development and APIs are not fixed**
 
+### NOTE: I recommend to use my new library https://github.com/inokawa/tweened
+
 ## Why?
 
 D3 is an excellent library to do data-driven visualization.
