@@ -4,9 +4,9 @@
 
 A small [React](https://github.com/facebook/react) hook to use [D3](https://github.com/d3/d3) in declarative way, for data visualization & flexible animation.
 
-**This is under development and APIs are not fixed**
+> **NOTE: I recommend to use my new library https://github.com/inokawa/react-animatable**
 
-### NOTE: I recommend to use my new library https://github.com/inokawa/tweened
+**This is under development and APIs are not fixed**
 
 ## Why?
 
